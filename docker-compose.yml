@@ -1,0 +1,59 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vue-app
+    ports:
+      - 8082:8082
+    depends_on:
+      - php
+      - mysql
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-app
+    ports:
+      - 82:82
+    depends_on:
+      - app
+      - php
+
+  mysql:
+    image: mysql/mysql-server:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: heslo
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - ./.docker/mysql/my.cnf:/etc/mysql/my.cnf
+      - mysqldata:/var/lib/mysql
+      - ./.database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: mysqladmin ping -h mysql -u root --password=$$MYSQL_ROOT_PASSWORD
+      interval: 30s
+      retries: 10
+
+  php:
+    build: ./.docker/php
+    working_dir: /var/www/php
+    volumes:
+      - ./backend:/var/www/php
+    depends_on:
+      - mysql
+    healthcheck:
+      test: mysqladmin ping -h mysql -u root --password=$$MYSQL_ROOT_PASSWORD
+      interval: 5s
+      retries: 8
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5
+    ports:
+      - 888:80
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+
+volumes:
+  mysqldata:
