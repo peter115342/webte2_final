@@ -24,7 +24,7 @@
               start
             />
 
-            Components
+            Components.
           </v-btn>
         </v-col>
 
