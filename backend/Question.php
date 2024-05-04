@@ -59,7 +59,7 @@ class Question
     {
         $query = "SELECT * FROM questions WHERE qr_code = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $qr_code);
+        $stmt->bind_param("s", $qr);
         $stmt->execute();
         $result = $stmt->get_result();
         $question = $result->fetch_assoc();
