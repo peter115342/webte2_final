@@ -2,7 +2,7 @@
 
 require_once "vendor/phpqrcode/qrlib.php";
 
-class Question 
+class Question
 {
 
     private $conn;
@@ -10,6 +10,20 @@ class Question
     public function __construct($conn)
     {
         $this->conn = $conn;
+    }
+
+    public function getAllQuestionAnswers($question_id)
+    {
+        $query = "SELECT answer FROM answers WHERE question_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $question_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $answers[] = $row;
+        }
+        $stmt->close();
+        return $answers;
     }
 
     public function getQuestionsByUserId($id)
@@ -59,7 +73,7 @@ class Question
     {
         $query = "SELECT * FROM questions WHERE qr_code = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $qr);
+        $stmt->bind_param("s", $qr_code);
         $stmt->execute();
         $result = $stmt->get_result();
         $question = $result->fetch_assoc();
@@ -141,7 +155,7 @@ class Question
         $stmt->execute();
         $result = $stmt->get_result();
         $answer_id = $result->fetch_assoc();
-        $answer_id = $answer_id['id']; 
+        $answer_id = $answer_id['id'];
         $stmt->close();
         if ($answer_id) {
             $query = "SELECT `count` FROM answers WHERE id = ?";
@@ -164,7 +178,7 @@ class Question
                 return false;
             }
         } else {
-            $answer = $data["answer"];    
+            $answer = $data["answer"];
             $stmt = $this->conn->prepare("INSERT INTO answers (question_id, type_id, answer, count, correct) VALUES (?, ?, ?, 1, ?)");
             $stmt->bind_param("iisi", $question_id, $type_id, $answer, $correct);
             $stmt->execute();
@@ -180,7 +194,7 @@ class Question
         $question = $data["question"];
         $subject = $data["subject"];
         $type = $data["type"];
-    
+
         $query = "SELECT id FROM types WHERE type = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $type);
@@ -189,7 +203,7 @@ class Question
         $type_id = $result->fetch_assoc();
         $type_id = $type_id['id'];
         $stmt->close();
-        
+
         if(!$type_id){
             return false;
         }
@@ -239,3 +253,4 @@ class Question
         return $affectedRows > 0;
     }
 }
+
