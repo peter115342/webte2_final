@@ -34,11 +34,12 @@ class User
     {
         $username = $data['username'];
         $password = $data['password'];
+        $hashed_password = password_hash($password, PASSWORD_ARGON2ID);
         $query = "SELECT username, administrator FROM users
-              WHERE users.username = ? AND users.password = ?";
+              WHERE users.username = ? AND users.password = ?";  // TODO: Vratit nejaky token
     
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("ss", $username, $password);
+        $stmt->bind_param("ss", $username, $hashed_password);
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
@@ -51,15 +52,17 @@ class User
     {
         $username = $data['username'];
         $password = $data['password'];
+        $hashed_password = password_hash($password, PASSWORD_ARGON2ID);
+        $administrator = $data['administrator'];
         $stmt = $this->conn->prepare("SELECT id FROM users WHERE username = ? AND password = ?");
-        $stmt->bind_param("ss", $username, $password);
+        $stmt->bind_param("ss", $username, $hashed_password);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             return false;
         }
-        $stmt = $this->conn->prepare("INSERT INTO users (username, password, administrator) VALUES (?, ?, 0)");
-        $stmt->bind_param("ss", $username, $password);
+        $stmt = $this->conn->prepare("INSERT INTO users (username, password, administrator) VALUES (?, ?, ?)");
+        $stmt->bind_param("ssi", $username, $hashed_password, $administrator);
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
@@ -68,9 +71,12 @@ class User
 
     public function updateUser($id, $data)
     {
+        $username = $data['username'];
         $password = $data['password'];
-        $stmt = $this->conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-        $stmt->bind_param("si", $password, $id);
+        $hashed_password = password_hash($password, PASSWORD_ARGON2ID);
+        $administrator = $data['administrator'];
+        $stmt = $this->conn->prepare("UPDATE users SET (username = ?, password = ?, administrator = ?) WHERE id = ?");
+        $stmt->bind_param("ssii", $username, $hashed_password, $administrator, $id);
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
             $stmt->close();

@@ -10,3 +10,4 @@ $conn = mysqli_connect($host, $user, $pass, $db);
 if (!$conn){
     die("DIE". mysqli_connect_error());
 }
+
