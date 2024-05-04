@@ -150,6 +150,32 @@ paths:
           description: Invalid input
         '422':
           description: Validation exception
+  /question/{questionId}/answers:
+    get:
+      tags:
+        - question
+      summary: Get all answers to a question
+      operationId: getAllQuestionAnswers
+      parameters:
+        - name: questionId
+          in: path
+          description: Fetch this QuestionId's answers
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAnswers'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GetAnswers'
+        '400':
+          description: Error
   /question/{questionId}:
     get:
       tags:
@@ -291,7 +317,7 @@ paths:
       responses:
         '200':
           description: OK
-    
+
         '400':
           description: Error
   /user/{userId}:
@@ -372,6 +398,13 @@ components:
           type: integer
       xml:
         name: user
+    GetAnswers:
+      type: object
+      properties:
+        answer:
+          type: string
+      xml:
+        name: answer
     GetQuestion:
       type: object
       properties:
