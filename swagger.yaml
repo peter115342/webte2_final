@@ -1,0 +1,480 @@
+openapi: 3.0.3
+info:
+  title: Hlasovací systém
+  version: 1.0.11
+paths:
+  /answer:
+    post:
+      tags:
+        - answer
+      summary: Add an answer to question
+      description: Add answer to question
+      operationId: createAnswer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAnswer'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PostAnswer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostAnswer'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
+  /answer/{answerId}:
+    put:
+      tags:
+        - answer
+      summary: Update an existing answer by id
+      description: Update an existing answer by id
+      operationId: updateAnswer
+      parameters:
+        - name: answerId
+          in: path
+          description: Answer id to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutAnswer'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PutAnswer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PutAnswer'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
+    delete:
+      tags:
+        - answer
+      summary: Delete an answer
+      description: Delete an answer
+      operationId: deleteAnswer
+      parameters:
+        - name: answerId
+          in: path
+          description: Answer id to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
+  /question/{userId}:
+    get:
+      tags:
+        - question
+      summary: Get question with user id
+      operationId: getQuestionByUserId
+      parameters:
+        - name: userId
+          in: path
+          description: Fetch this UserId's questions
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQuestionsByUserId'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GetQuestionsByUserId'
+        '400':
+          description: Error
+  /question:
+    post:
+      tags:
+        - question
+      summary: Create a question
+      operationId: createQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostQuestion'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PostQuestion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostQuestion'
+      responses:
+        '200':
+          description: Ok
+        '400':
+          description: Error
+  /{code}:
+    get:
+      tags:
+        - question
+      summary: Get question with code
+      operationId: getQuestionWithCode
+      parameters:
+        - name: code
+          in: path
+          description: Code of the question to be fetched
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQuestion'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /question/{questionId}:
+    get:
+      tags:
+        - question
+      summary: Get question by id
+      operationId: getQuestionbyId
+      parameters:
+        - name: questionId
+          in: path
+          description: ID of question that needs to be fetched
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQuestion'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GetQuestion'
+        '400':
+          description: Error
+    put:
+      tags:
+        - question
+      summary: Update a question
+      operationId: updateQuestion
+      parameters:
+        - name: questionId
+          in: path
+          description: ID of question that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutQuestion'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PutQuestion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PutQuestion'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
+    delete:
+      tags:
+        - question
+      summary: Delete question by id
+      operationId: deleteQuestion
+      parameters:
+        - name: questionId
+          in: path
+          description: ID of the question to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Login
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Login'
+        '400':
+          description: Error
+  /user:
+    get:
+      tags:
+        - user
+      summary: Get all users
+      operationId: getUsers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Login'
+        '400':
+          description: Error
+    post:
+      tags:
+        - user
+      summary: Create user
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: OK
+    
+        '400':
+          description: Error
+  /user/{userId}:
+    put:
+      tags:
+        - user
+      summary: Update user
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          description: Id of user that need to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          description: Id of user that need to be deleted
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
+components:
+  schemas:
+    GetQuestionsByUserId:
+      type: object
+      properties:
+        question_id:
+          type: integer
+        date:
+          type: integer
+        'user_id:':
+          type: integer
+        type_id:
+          type: integer
+        code:
+          type: string
+        qr_code:
+          type: string
+        question:
+          type: string
+        subject:
+          type: string
+        answer:
+          type: string
+        count:
+          type: integer
+        correct:
+          type: integer
+        type:
+          type: integer
+      xml:
+        name: user
+    GetQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: integer
+        'user_id:':
+          type: integer
+        type_id:
+          type: integer
+        code:
+          type: string
+        qr_code:
+          type: string
+        question:
+          type: string
+        subject:
+          type: string
+      xml:
+        name: user
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        administrator:
+          type: boolean
+          format: int1
+      xml:
+        name: user
+    PostAnswer:
+      type: object
+      properties:
+        correct:
+          type: integer
+          format: int1
+        answer:
+          type: string
+        question_id:
+          type: integer
+      xml:
+        name: tag
+    PutAnswer:
+      type: object
+      properties:
+        correct:
+          type: integer
+          format: int1
+        answer:
+          type: string
+      xml:
+        name: tag
+    PutQuestion:
+      type: object
+      properties:
+        subject:
+          type: string
+        question:
+          type: string
+        type:
+          type: string
+      xml:
+        name: question
+    PostQuestion:
+      type: object
+      properties:
+        subject:
+          type: string
+        question:
+          type: string
+        type:
+          type: string
+        user_id:
+          type: integer
+      xml:
+        name: question
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        administrator:
+          type: integer
+    Type:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        type:
+          type: string
+          example: open_ended
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+      xml:
+        name: '##default'

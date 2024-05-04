@@ -1,5 +1,7 @@
 <?php
 
+require_once "vendor/phpqrcode/qrlib.php";
+
 class Question 
 {
 
@@ -9,7 +11,6 @@ class Question
     {
         $this->conn = $conn;
     }
-
 
     public function getQuestionsByUserId($id)
     {
@@ -74,6 +75,30 @@ class Question
         $subject = $data["subject"];
         $type = $data["type"];
         $user_id = $data["user_id"];
+        do {
+            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $charactersLength = strlen($characters);
+            $randomString = '';
+            for ($i = 0; $i < 5; $i++) {
+                $randomString .= $characters[rand(0, $charactersLength - 1)];
+            }
+
+            $code = $randomString;
+            $query = "SELECT COUNT(*) as count FROM questions WHERE code = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("s", $code);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $stmt->close();
+        } while ($row['count'] > 0);
+        $url = "https://example.com/api/endpoint";   // TODO: Doplnit spravnu URL
+        $dir = "qr_codes/";
+        if (!file_exists($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        $qrcode_filename = $dir . "qr_code_" . uniqid() . ".png";
+        QRcode::png($url, $qrcode_filename);
 
         $query = "SELECT id FROM types WHERE type = ?";
         $stmt = $this->conn->prepare($query);
@@ -85,8 +110,8 @@ class Question
         if(!$type_id){
             return false;
         }
-        $stmt = $this->conn->prepare("INSERT INTO questions (question, subject, type_id, user_id, code, qr_code) VALUES (?, ?, ?, ?, 'haloo','haloo')");
-        $stmt->bind_param("ssii", $question, $subject, $type_id, $user_id);
+        $stmt = $this->conn->prepare("INSERT INTO questions (question, subject, type_id, user_id, code, qr_code) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssiiss", $question, $subject, $type_id, $user_id, $code, $qrcode_filename);
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
@@ -98,6 +123,7 @@ class Question
         $answer = $data["answer"];
         $question_id = $data["question_id"];
         $correct = $data["correct"];
+
         $query = "SELECT type_id FROM questions WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $question_id);
@@ -182,8 +208,9 @@ class Question
     public function updateAnswer($id, $data)
     {
         $answer = $data["answer"];
-        $stmt = $this->conn->prepare("UPDATE answers SET answer = ? WHERE id = ?");
-        $stmt->bind_param("si", $answer, $id);
+        $correct = $data["correct"];
+        $stmt = $this->conn->prepare("UPDATE answers SET (answer = ?, correct = ?) WHERE id = ?");
+        $stmt->bind_param("sii", $answer, $correct, $id);
         $stmt->execute();
         if ($stmt->affected_rows > 0) {
             $stmt->close();

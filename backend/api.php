@@ -3,7 +3,8 @@
 require_once "User.php";
 require_once "Question.php";
 require_once "config.php";
-
+error_reporting(E_ALL);    // TODO: Odstranit
+ini_set('display_errors', 1);
 $userObject = new User($conn);
 $questionObject = new Question($conn);
 
@@ -14,16 +15,15 @@ $endpoint = $params['endpoint'];
 
 
 $endpoint = '/' . $endpoint;
-
 header('Content-Type: application/json');
 switch ($method) {
     case 'GET':
         // GET USER
-        if ($endpoint ===  "/login") {
+        if ($endpoint ===  "/user/login") {
             $data = json_decode(file_get_contents("php://input"), true);
             if (empty($data)) {
                 http_response_code(400);
-                echo json_encode(["message" => "Request body is empty or blank"]);
+                echo json_encode(["message" => "Error"]);
                 exit(); 
             }            
             $user = $userObject->getUser($data);
@@ -31,13 +31,13 @@ switch ($method) {
             echo json_encode($user);
         }  
         // GET ALL USERS
-        elseif ($endpoint ===  "/users") {
+        elseif ($endpoint ===  "/user") {
            $users = $userObject->getAllUsers();
            http_response_code(200);
            echo json_encode($users);
         }  
         // GET ALL QUESTIONS BY USER
-        elseif (preg_match("/^\/userQuestions\/(\d+)$/", $endpoint, $matches)) {
+        elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $questions = $questionObject->getQuestionsByUserId($id);
             http_response_code(200);
@@ -53,7 +53,9 @@ switch ($method) {
         
         // QUESTION BY CODE
         elseif (preg_match("/^\/([a-zA-Z0-9]{5})$/", $endpoint, $matches)) {
+            echo "imhere";
             $code = $matches[1]; 
+            echo $code;
             $question = $questionObject->getQuestionByCode($code);
             http_response_code(200);
             echo json_encode($question);
@@ -196,4 +198,4 @@ switch ($method) {
         echo json_encode(["message" => "Method not allowed"]);
 
         
-    }
+    }  
