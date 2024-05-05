@@ -14,7 +14,7 @@ class Question
 
     public function getAllQuestionAnswers($question_id)
     {
-        $query = "SELECT answer FROM answers WHERE question_id = ?";
+        $query = "SELECT answer, count FROM answers WHERE question_id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $question_id);
         $stmt->execute();
