@@ -403,6 +403,8 @@ components:
       properties:
         answer:
           type: string
+        count:
+          type: integer
       xml:
         name: answer
     GetQuestion:
