@@ -24,24 +24,31 @@ switch ($method) {
             if (empty($data)) {
                 http_response_code(400);
                 echo json_encode(["message" => "Error"]);
-                exit(); 
-            }            
+                exit();
+            }
             $user = $userObject->getUser($data);
             http_response_code(200);
             echo json_encode($user);
-        }  
+        }
         // GET ALL USERS
         elseif ($endpoint ===  "/user") {
-           $users = $userObject->getAllUsers();
-           http_response_code(200);
-           echo json_encode($users);
-        }  
+            $users = $userObject->getAllUsers();
+            http_response_code(200);
+            echo json_encode($users);
+        }
         // GET ALL QUESTIONS BY USER
         elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $questions = $questionObject->getQuestionsByUserId($id);
             http_response_code(200);
             echo json_encode($questions);
+        }
+        // GET ALL ANSWERS TO QUESTION
+        elseif (preg_match("/^\/question\/(\d+)\/answers$/", $endpoint, $matches)) {
+            $question_id = $matches[1];
+            $answers = $questionObject->getAllQuestionAnswers($question_id);
+            http_response_code(200);
+            echo json_encode($answers);
         }
         // QUESTION BY ID
         elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
@@ -50,23 +57,23 @@ switch ($method) {
             http_response_code(200);
             echo json_encode($question);
         }
-        
+
         // QUESTION BY CODE
         elseif (preg_match("/^\/([a-zA-Z0-9]{5})$/", $endpoint, $matches)) {
             echo "imhere";
-            $code = $matches[1]; 
+            $code = $matches[1];
             echo $code;
             $question = $questionObject->getQuestionByCode($code);
             http_response_code(200);
             echo json_encode($question);
-        } 
+        }
         else {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
         }
         break;
     case 'POST':
-        // CREATE ANSWER 
+        // CREATE ANSWER
         if ($endpoint === "/answer") {
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $questionObject->createAnswer($data);
@@ -77,7 +84,7 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        } 
+        }
         // CREATE QUESTION
         elseif ($endpoint === "/question") {
             $data = json_decode(file_get_contents("php://input"), true);
@@ -89,7 +96,7 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        } 
+        }
         // CREATE USER
         elseif ($endpoint === "/user") {
             $data = json_decode(file_get_contents("php://input"), true);
@@ -119,8 +126,8 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        } 
-        // UPDATE QUESTION 
+        }
+        // UPDATE QUESTION
         elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $data = json_decode(file_get_contents("php://input"), true);
@@ -163,7 +170,7 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        } 
+        }
         // DELETE QUESTION
         elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
@@ -197,5 +204,5 @@ switch ($method) {
         http_response_code(405);
         echo json_encode(["message" => "Method not allowed"]);
 
-        
-    }  
+
+}
