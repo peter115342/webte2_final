@@ -1,5 +1,6 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <HelloWorld />
+  <HomePage />
 </template>
 
 <script setup>
