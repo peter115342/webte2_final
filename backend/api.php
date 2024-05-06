@@ -37,7 +37,7 @@ switch ($method) {
             echo json_encode($users);
         }
         // GET ALL QUESTIONS BY USER
-        elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
+        elseif (preg_match("/^\/question\/user\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $questions = $questionObject->getQuestionsByUserId($id);
             http_response_code(200);
