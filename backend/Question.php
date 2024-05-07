@@ -30,7 +30,7 @@ class Question
     {
         $query = "SELECT questions.date, 
         questions.user_id , questions.subject , questions.question , questions.type_id, questions.code, 
-        questions.qr_code, answers.question_id, answers.answer, answers.correct, answers.count, types.type
+        questions.qr_code, questions.id as question_id, answers.answer, answers.correct, answers.count, types.type
         FROM questions 
         LEFT JOIN answers ON answers.question_id = questions.id
         LEFT JOIN types ON answers.type_id = types.id
