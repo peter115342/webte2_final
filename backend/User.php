@@ -10,6 +10,10 @@ class User
         $this->conn = $conn;
     }
 
+    private function generateAccessToken($userId) {
+        return md5($userId . time()); 
+    }
+    
     public function getAllUsers()
     {
         /* GET ALL USERS + QUESTIONS + ANSWERS
@@ -21,7 +25,7 @@ class User
         LEFT JOIN answers ON answers.question_id = questions.id
         LEFT JOIN types ON answers.type_id = types.id";
         */
-        $query = "SELECT username, administrator FROM users";
+        $query = "SELECT id, username, administrator FROM users";
         $result = mysqli_query($this->conn, $query);
         $users = [];
         while ($row = mysqli_fetch_assoc($result)) {
@@ -30,30 +34,34 @@ class User
         return $users;
     }
 
-    public function getUser($data)
+    public function login($data)
     {
         $username = $data['username'];
         $password = $data['password'];
-        $hashed_password = password_hash($password, PASSWORD_ARGON2ID);
-        $query = "SELECT username, administrator FROM users
-              WHERE users.username = ? AND users.password = ?";  // TODO: Vratit nejaky token
-    
+        $query = "SELECT id, username, password, administrator FROM users
+              WHERE username = ?";  
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("ss", $username, $hashed_password);
+        $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
         $stmt->close();
-        return $user;
+        if ($user && password_verify($password, $user['password'])) {
+            $accessToken = $this->generateAccessToken($user['id']);
+            $user['access_token'] = $accessToken;    
+            unset($user['password']); 
+            return $user;
+        } else {
+            return null; 
+        }
     }
-
 
     public function createUser($data)
     {
         $username = $data['username'];
         $password = $data['password'];
         $hashed_password = password_hash($password, PASSWORD_ARGON2ID);
-        $administrator = $data['administrator'];
+        $administrator = $data['administrator'];        
         $stmt = $this->conn->prepare("SELECT id FROM users WHERE username = ? AND password = ?");
         $stmt->bind_param("ss", $username, $hashed_password);
         $stmt->execute();

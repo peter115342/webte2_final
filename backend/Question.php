@@ -1,7 +1,5 @@
 <?php
 
-require_once "vendor/phpqrcode/qrlib.php";
-
 class Question
 {
 
@@ -30,7 +28,7 @@ class Question
     {
         $query = "SELECT questions.date, 
         questions.user_id , questions.subject , questions.question , questions.type_id, questions.code, 
-        questions.qr_code, questions.id as question_id, answers.answer, answers.correct, answers.count, types.type
+        questions.id as question_id, answers.answer, answers.correct, answers.count, types.type
         FROM questions 
         LEFT JOIN answers ON answers.question_id = questions.id
         LEFT JOIN types ON answers.type_id = types.id
@@ -69,19 +67,6 @@ class Question
         $stmt->close();
         return $question;
     }
-    public function getQuestionByQR($qr)
-    {
-        $query = "SELECT * FROM questions WHERE qr_code = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $qr);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $question = $result->fetch_assoc();
-        $stmt->close();
-        return $question;
-    }
-
-
 
     public function createQuestion($data)
     {
@@ -106,13 +91,6 @@ class Question
             $row = $result->fetch_assoc();
             $stmt->close();
         } while ($row['count'] > 0);
-        $url = "https://example.com/api/endpoint";   // TODO: Doplnit spravnu URL
-        $dir = "qr_codes/";
-        if (!file_exists($dir)) {
-            mkdir($dir, 0777, true);
-        }
-        $qrcode_filename = $dir . "qr_code_" . uniqid() . ".png";
-        QRcode::png($url, $qrcode_filename);
 
         $query = "SELECT id FROM types WHERE type = ?";
         $stmt = $this->conn->prepare($query);
@@ -124,8 +102,8 @@ class Question
         if(!$type_id){
             return false;
         }
-        $stmt = $this->conn->prepare("INSERT INTO questions (question, subject, type_id, user_id, code, qr_code) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssiiss", $question, $subject, $type_id, $user_id, $code, $qrcode_filename);
+        $stmt = $this->conn->prepare("INSERT INTO questions (question, subject, type_id, user_id, code) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssiis", $question, $subject, $type_id, $user_id, $code);
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();

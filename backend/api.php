@@ -1,5 +1,8 @@
 <?php
-
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: *');
+header('Access-Control-Allow-Headers: *');
+header('Content-Type: application/json');
 require_once "User.php";
 require_once "Question.php";
 require_once "config.php";
@@ -7,31 +10,15 @@ error_reporting(E_ALL);    // TODO: Odstranit
 ini_set('display_errors', 1);
 $userObject = new User($conn);
 $questionObject = new Question($conn);
-
 $method = $_SERVER['REQUEST_METHOD'];
 $queryString = $_SERVER['QUERY_STRING'];
 parse_str($queryString, $params);
 $endpoint = $params['endpoint'];
-
-
 $endpoint = '/' . $endpoint;
-header('Content-Type: application/json');
 switch ($method) {
     case 'GET':
-        // GET USER
-        if ($endpoint ===  "/user/login") {
-            $data = json_decode(file_get_contents("php://input"), true);
-            if (empty($data)) {
-                http_response_code(400);
-                echo json_encode(["message" => "Error"]);
-                exit();
-            }
-            $user = $userObject->getUser($data);
-            http_response_code(200);
-            echo json_encode($user);
-        }
         // GET ALL USERS
-        elseif ($endpoint ===  "/user") {
+        if ($endpoint ===  "/user") {
             $users = $userObject->getAllUsers();
             http_response_code(200);
             echo json_encode($users);
@@ -60,9 +47,7 @@ switch ($method) {
 
         // QUESTION BY CODE
         elseif (preg_match("/^\/([a-zA-Z0-9]{5})$/", $endpoint, $matches)) {
-            echo "imhere";
             $code = $matches[1];
-            echo $code;
             $question = $questionObject->getQuestionByCode($code);
             http_response_code(200);
             echo json_encode($question);
@@ -73,8 +58,25 @@ switch ($method) {
         }
         break;
     case 'POST':
+         // LOGIN USER
+         if ($endpoint ===  "/user/login") {
+            $data = json_decode(file_get_contents("php://input"), true);
+            if (empty($data)) {
+                http_response_code(400);
+                echo json_encode(["message" => "Error"]);
+                exit();
+            }
+            $user = $userObject->login($data);           
+            if($user){
+                echo json_encode($user);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
         // CREATE ANSWER
-        if ($endpoint === "/answer") {
+        else    if ($endpoint === "/answer") {
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $questionObject->createAnswer($data);
             if($result){
