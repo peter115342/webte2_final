@@ -1,10 +1,12 @@
+<!-- eslint-disable vue/multi-word-component-names -->
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <template>
   <v-container fluid>
     <v-row justify="center">
       <v-col cols="12" md="8">
         <v-card>
           <v-card-title class="headline">
-            Questions
+            {{ $t('questionsTitle') }}
           </v-card-title>
           <v-card-text>
             <v-list dense>
@@ -19,6 +21,11 @@
             </v-list>
           </v-card-text>
         </v-card>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-col cols="12" md="8">
+        <v-btn color="primary" @click="submitAnswers">Submit</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -39,7 +46,7 @@ export default {
   },
   methods: {
     fetchQuestions() {
-      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/1')
+      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/3)
         .then(response => {
           this.questions = response.data.reduce((acc, cur) => {
             const existingQuestion = acc.find(item => item.question_id === cur.question_id);
@@ -59,7 +66,7 @@ export default {
             return acc;
           }, []);
           console.log(this.questions);
-          console.log(response.data); // Zobraziť dáta v konzole
+          console.log(response.data); // Display data in the console
         })
         .catch(error => {
           console.error('Error fetching questions:', error);
@@ -67,6 +74,9 @@ export default {
     },
     answerIsNotNull(answer) {
       return answer !== null;
+    },
+    submitAnswers() {
+      //TODO submitting logic
     }
   }
 };
