@@ -250,35 +250,7 @@ paths:
           description: OK
         '400':
           description: Error
-  /user/login:
-    get:
-      tags:
-        - user
-      summary: Login
-      operationId: loginUser
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Login'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Login'
-        '400':
-          description: Error
+  
   /user:
     get:
       tags:
@@ -291,10 +263,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Login'
+                $ref: '#/components/schemas/GetUser'
             application/xml:
               schema:
-                $ref: '#/components/schemas/Login'
+                $ref: '#/components/schemas/GetUser'
         '400':
           description: Error
     post:
@@ -318,6 +290,35 @@ paths:
         '200':
           description: OK
 
+        '400':
+          description: Error
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: Login
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Login'
         '400':
           description: Error
   /user/{userId}:
@@ -369,6 +370,15 @@ paths:
           description: Error
 components:
   schemas:
+    LoginUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      xml:
+        name: user
     GetQuestionsByUserId:
       type: object
       properties:
@@ -440,6 +450,17 @@ components:
           format: int1
       xml:
         name: user
+    GetUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        administrator:
+          type: integer
+      xml:
+        name: user
     PostAnswer:
       type: object
       properties:
@@ -489,10 +510,14 @@ components:
     Login:
       type: object
       properties:
+        id:
+          type: integer
         username:
           type: string
         administrator:
           type: integer
+        access_token:
+          type: string
     Type:
       type: object
       properties:
