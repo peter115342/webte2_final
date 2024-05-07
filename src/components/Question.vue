@@ -4,28 +4,28 @@
   <v-container fluid>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <v-card>
+        <v-card v-for="question in questions" :key="question.question_id">
           <v-card-title class="headline">
-            {{ $t('questionsTitle') }}
+            {{ question.question }}
           </v-card-title>
           <v-card-text>
             <v-list dense>
-              <v-list-item v-for="question in questions" :key="question.question_id">
+              <v-list-item v-if="question.type_id === 2">
                 <v-list-item-content>
-                  <v-list-item-title>{{ question.question }}</v-list-item-title>
                   <v-checkbox-group v-model="selectedAnswers[question.question_id]">
                     <v-checkbox v-if="answerIsNotNull(answer)" v-for="(answer, index) in question.answers" :key="index" :label="answer.answer" :value="answer.answer"></v-checkbox>
                   </v-checkbox-group>
                 </v-list-item-content>
               </v-list-item>
+              <v-list-item v-else-if="question.type_id === 1">
+                <v-list-item-content>
+                  <v-text-field v-model="selectedAnswers[question.question_id]" label="Your Answer"></v-text-field>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
+            <v-btn color="primary" @click="submitAnswers">Submit</v-btn>
           </v-card-text>
         </v-card>
-      </v-col>
-    </v-row>
-    <v-row justify="center">
-      <v-col cols="12" md="8">
-        <v-btn color="primary" @click="submitAnswers">Submit</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     fetchQuestions() {
-      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/1')
+      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/5')
         .then(response => {
           this.questions = response.data.reduce((acc, cur) => {
             const existingQuestion = acc.find(item => item.question_id === cur.question_id);
@@ -59,6 +59,7 @@ export default {
                 acc.push({
                   question_id: cur.question_id,
                   question: cur.question,
+                  type_id: cur.type_id,
                   answers: [{ answer: cur.answer }]
                 });
               }
@@ -66,7 +67,7 @@ export default {
             return acc;
           }, []);
           console.log(this.questions);
-          console.log(response.data); // Display data in the console
+          console.log(response.data); // Zobraziť dáta v konzole
         })
         .catch(error => {
           console.error('Error fetching questions:', error);
@@ -76,7 +77,8 @@ export default {
       return answer !== null;
     },
     submitAnswers() {
-      //TODO submitting logic
+      // Tu môžete pridať ďalšiu logiku na spracovanie odpovedí
+      console.log('Submitted answers:', this.selectedAnswers);
     }
   }
 };
