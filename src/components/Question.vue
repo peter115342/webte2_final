@@ -1,45 +1,77 @@
 <template>
-  <div class="question">
-    <h2>{{ question.subject }}</h2>
-    <p>{{ question.question }}</p>
-    <ul>
-      <li v-for="(answer, index) in question.answers" :key="index">
-        {{ answer.answer }}
-      </li>
-    </ul>
-  </div>
+  <v-container fluid>
+    <v-row justify="center">
+      <v-col cols="12" md="8">
+        <v-card>
+          <v-card-title class="headline">
+            Questions
+          </v-card-title>
+          <v-card-text>
+            <v-list dense>
+              <v-list-item v-for="question in questions" :key="question.question_id">
+                <v-list-item-content>
+                  <v-list-item-title>{{ question.question }}</v-list-item-title>
+                  <v-checkbox-group v-model="selectedAnswers[question.question_id]">
+                    <v-checkbox v-if="answerIsNotNull(answer)" v-for="(answer, index) in question.answers" :key="index" :label="answer.answer" :value="answer.answer"></v-checkbox>
+                  </v-checkbox-group>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  props: {
-    question: {
-      type: Object,
-      required: true
+  data() {
+    return {
+      questions: [],
+      selectedAnswers: {}
+    };
+  },
+  mounted() {
+    this.fetchQuestions();
+  },
+  methods: {
+    fetchQuestions() {
+      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/1')
+        .then(response => {
+          this.questions = response.data.reduce((acc, cur) => {
+            const existingQuestion = acc.find(item => item.question_id === cur.question_id);
+            if (existingQuestion) {
+              if (cur.answer !== null) {
+                existingQuestion.answers.push({ answer: cur.answer });
+              }
+            } else {
+              if (cur.answer !== null) {
+                acc.push({
+                  question_id: cur.question_id,
+                  question: cur.question,
+                  answers: [{ answer: cur.answer }]
+                });
+              }
+            }
+            return acc;
+          }, []);
+          console.log(this.questions);
+          console.log(response.data); // Zobraziť dáta v konzole
+        })
+        .catch(error => {
+          console.error('Error fetching questions:', error);
+        });
+    },
+    answerIsNotNull(answer) {
+      return answer !== null;
     }
   }
 };
 </script>
 
 <style scoped>
-.question {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-h2 {
-  color: #333;
-  margin-bottom: 10px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 5px;
-}
+/* Add your component styles here */
 </style>
