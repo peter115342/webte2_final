@@ -98,6 +98,7 @@ class Question
         $stmt->execute();
         $result = $stmt->get_result();
         $type_id = $result->fetch_assoc();
+        $type_id = $type_id['id'];
         $stmt->close();
         if(!$type_id){
             return false;
