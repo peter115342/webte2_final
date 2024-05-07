@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     fetchQuestions() {
-      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/3)
+      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/1')
         .then(response => {
           this.questions = response.data.reduce((acc, cur) => {
             const existingQuestion = acc.find(item => item.question_id === cur.question_id);
