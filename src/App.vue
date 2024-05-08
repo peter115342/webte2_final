@@ -8,7 +8,6 @@
         <v-dialog v-model="showLoginForm" max-width="500">
           <template v-slot:activator="{ on }"></template>
           <v-card>
-            <v-card-title>Login</v-card-title>
             <v-card-text>
               <Login @loginSuccess="handleLoginSuccess" @loginError="handleLoginError" />
             </v-card-text>
