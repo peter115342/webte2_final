@@ -3,7 +3,18 @@
     <v-app-bar app color="primary">
       <v-toolbar-title class="title">PresentFlow</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="!isLoggedIn" @click="login">{{ $t('login') }}</v-btn>
+      <template v-if="!isLoggedIn">
+        <v-btn @click="showLoginForm = true">{{ $t('login') }}</v-btn>
+        <v-dialog v-model="showLoginForm" max-width="500">
+          <template v-slot:activator="{ on }"></template>
+          <v-card>
+            <v-card-title>Login</v-card-title>
+            <v-card-text>
+              <Login @loginSuccess="handleLoginSuccess" @loginError="handleLoginError" />
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+      </template>
       <v-icon v-if="isLoggedIn">mdi-account-circle</v-icon>
       <v-btn icon @click="toggleLanguage">
         <v-img :src="currentFlag" alt="Language Flag" width="24" height="24" />
@@ -17,39 +28,37 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import Login from './components/Login.vue';
 
-const { locale } = useI18n(); // useI18n should be called within the setup function
+const { locale } = useI18n(); 
 
 const isLoggedIn = ref(false);
-const login = () => {
+const showLoginForm = ref(false);
+
+const handleLoginSuccess = () => {
   isLoggedIn.value = true;
+  showLoginForm.value = false;
+};
+
+const handleLoginError = () => {
+  // Handle login error, show message or take appropriate action
+};
+
+const toggleLanguage = async () => {
+  locale.value = locale.value === 'en' ? 'sk' : 'en';
 };
 
 let englishFlagUrl = '';
 let slovakFlagUrl = '';
 
-const toggleLanguage = async () => {
-  locale.value = locale.value === 'en' ? 'sk' : 'en';
-  // Load the flag images
-  if (locale.value === 'en') {
-    englishFlagUrl = (await import('@/assets/united-kingdom.png')).default;
-  } else {
-    slovakFlagUrl = (await import('@/assets/slovakia.png')).default;
-  }
-};
-
-// Initial loading of flag images and setting the initial flag URL
 toggleLanguage();
 
-// Computed property to dynamically get the current flag URL
 const currentFlag = ref('');
-import { watch } from 'vue';
 watch(locale, () => {
   currentFlag.value = locale.value === 'en' ? englishFlagUrl : slovakFlagUrl;
 });
-
 </script>
 
 <style scoped>
