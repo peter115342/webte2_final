@@ -1,5 +1,8 @@
 {
-    "appTitle": "PresentFlow",
-    "login": "Login"
+    "appTitle": "PresentFlow EN",
+    "login": "Login",
+    "register": "Register",
+    "backToLogin": "Back to login",
+    "submit": "Submit"
   }
   

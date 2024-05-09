@@ -11,15 +11,15 @@
           outlined
           required
         ></v-text-field>
-        <v-btn type="submit" color="primary">Submit</v-btn>
+        <v-btn type="submit" color="primary">{{ $t('submit') }}</v-btn>
       </v-form>
     </v-responsive>
   </v-container>
 </template>
 
 <script setup>
-  import { useRouter } from 'vue-router';
   import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
   const router = useRouter();
   const code = ref('');
