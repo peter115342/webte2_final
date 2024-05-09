@@ -1,65 +1,65 @@
 <template>
-  <v-container>
-    <v-row justify="center">
-      <v-col cols="12" sm="10" md="10" lg="8">
-        <v-card>
-          <v-card-title class="headline">{{ formMode === 'login' ? 'Login' : 'Register' }}</v-card-title>
-          <v-card-text>
-            <template v-if="formMode === 'login'">
-              <v-form @submit.prevent="login"> 
-                <v-text-field
-                  v-model="username"
-                  label="Username"
-                  outlined
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="password"
-                  label="Password"
-                  type="password"
-                  outlined
-                  required
-                ></v-text-field>
-                <v-btn-group>
-                  <v-btn type="submit" color="primary">Login</v-btn>
-                  <v-btn @click="toggleFormMode" color="success">Register</v-btn>
-                </v-btn-group>
-              </v-form>
-            </template>
-            <template v-else>
-              <v-form @submit.prevent="register">
-                <v-text-field
-                  v-model="newUsername"
-                  label="New Username"
-                  outlined
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="newPassword"
-                  label="New Password"
-                  type="password"
-                  outlined
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="confirmPassword"
-                  label="Confirm Password"
-                  type="password"
-                  outlined
-                  required
-                ></v-text-field>
-                <v-btn-group>
-                  <v-btn type="submit" color="primary">Register</v-btn>
-                  <v-btn @click="toggleFormMode" color="warning">Back to Login</v-btn>
-                </v-btn-group>
-              </v-form>
-            </template>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
+    <v-container>
+      <v-row justify="center">
+        <v-col cols="12" sm="10" md="10" lg="8">
+          <v-card>
+            <v-card-title class="headline">{{ formMode === 'login' ?  $t('login')  :  $t('register')  }}</v-card-title>
+            <v-card-text>
+              <template v-if="formMode === 'login'">
+                <v-form @submit.prevent="login"> 
+                  <v-text-field
+                    v-model="username"
+                    label="Username"
+                    outlined
+                    required
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="password"
+                    label="Password"
+                    type="password"
+                    outlined
+                    required
+                  ></v-text-field>
+                  <v-btn-group>
+                    <v-btn type="submit" color="primary">{{ $t('login') }}</v-btn>
+                    <v-btn @click="toggleFormMode">{{ $t('register') }}</v-btn>
+                  </v-btn-group>
+                </v-form>
+              </template>
+              <template v-else>
+                <v-form @submit.prevent="register">
+                  <v-text-field
+                    v-model="newUsername"
+                    label="New Username"
+                    outlined
+                    required
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="newPassword"
+                    label="New Password"
+                    type="password"
+                    outlined
+                    required
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="confirmPassword"
+                    label="Confirm Password"
+                    type="password"
+                    outlined
+                    required
+                  ></v-text-field>
+                  <v-btn-group>
+                    <v-btn type="submit" color="primary">{{ $t('register') }}</v-btn>
+                    <v-btn @click="toggleFormMode">{{ $t('backToLogin') }}</v-btn>
+                  </v-btn-group>
+                </v-form>
+              </template>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </template>
 
 <script setup>
 import axios from 'axios';

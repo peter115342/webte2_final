@@ -23,7 +23,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-list>
-            <v-btn color="primary" @click="submitAnswers">Submit</v-btn>
+            <v-btn color="primary" @click="submitAnswers">{{ $t('submit') }}</v-btn>
           </v-card-text>
         </v-card>
       </v-col>
@@ -46,38 +46,44 @@ export default {
   },
   methods: {
     fetchQuestions() {
-      axios.get('https://node19.webte.fei.stuba.sk/nemecko/api/question/user/5')
-        .then(response => {
-          this.questions = response.data.reduce((acc, cur) => {
-            const existingQuestion = acc.find(item => item.question_id === cur.question_id);
-            if (existingQuestion) {
-              if (cur.answer !== null) {
-                existingQuestion.answers.push({ answer: cur.answer });
-              }
-            } else {
-              if (cur.answer !== null) {
-                acc.push({
-                  question_id: cur.question_id,
-                  question: cur.question,
-                  type_id: cur.type_id,
-                  answers: [{ answer: cur.answer }]
-                });
-              }
-            }
-            return acc;
-          }, []);
-          console.log(this.questions);
-          console.log(response.data); // Zobraziť dáta v konzole
-        })
-        .catch(error => {
-          console.error('Error fetching questions:', error);
+  const code = "VlCPs"; //"code" otázky
+
+  axios.get(`https://node19.webte.fei.stuba.sk/nemecko/api/${code}`)
+    .then(response => {
+      const responseData = response.data;
+      if (typeof responseData === 'object' && responseData !== null) {
+        this.questions = [responseData].map(questionData => ({
+          question_id: questionData.id,
+          question: questionData.question,
+          type_id: questionData.type_id,
+          answers: [{ answer: questionData.answer }]
+        }));
+        this.questions.forEach(question => {
+          axios.get(`https://node19.webte.fei.stuba.sk/nemecko/api/question/${question.question_id}/answers`)
+            .then(response => {
+              // Pridanie odpovedí k danej otázke
+              question.answers = response.data.map(answerData => ({
+                answer: answerData.answer
+              }));
+            })
+            .catch(error => {
+              console.error('Error fetching answers for question:', question.question_id, error);
+            });
         });
-    },
+      } else {
+        console.error("Invalid response data format:", responseData);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching questions:', error);
+    });
+},
+
+
     answerIsNotNull(answer) {
       return answer !== null;
     },
     submitAnswers() {
-      // Tu môžete pridať ďalšiu logiku na spracovanie odpovedí
       console.log('Submitted answers:', this.selectedAnswers);
     }
   }

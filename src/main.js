@@ -6,15 +6,17 @@ import App from './App.vue'
 
 // Composables
 import { createApp } from 'vue'
-import vuetify from './plugins/vuetify'
 import { createI18n } from 'vue-i18n'
+import en from './locales/en.json'
+import sk from './locales/sk.json'
+import vuetify from './plugins/vuetify'
 
 const i18n = createI18n({
   legacy: false,
   locale: 'en', 
   messages: {
-    en: () => import('./locales/en.json'),
-    sk: () => import('./locales/sk.json')
+    en: en,
+    sk: sk,
   }
 })
 

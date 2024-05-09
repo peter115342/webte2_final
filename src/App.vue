@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app color="primary">
-      <v-toolbar-title class="title">PresentFlow</v-toolbar-title>
+      <v-toolbar-title class="title">{{ $t('appTitle') }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <template v-if="!isLoggedIn">
         <v-btn @click="showLoginForm = true" class="login-button elevation-2">{{ $t('login') }}</v-btn>
@@ -44,6 +44,7 @@ import { useI18n } from 'vue-i18n';
 import Login from './components/Login.vue';
 import { useAppStore } from './store/app';
 
+
 const { locale } = useI18n(); 
 const store = useAppStore();
 
@@ -68,6 +69,13 @@ const toggleLanguage = async () => {
   locale.value = locale.value === 'en' ? 'sk' : 'en';
 };
 
+// Import translations for language flags
+import skFlag from './assets/slovakia.png';
+import enFlag from './assets/united-kingdom.png';
+
+let currentFlag = ref('');
+watch(locale, () => {
+  currentFlag.value = locale.value === 'en' ? enFlag : skFlag;
 // Function to handle logout
 const logout = () => {
   isLoggedIn.value = false;
@@ -105,6 +113,9 @@ onMounted(() => {
     }
   });
 });
+
+// Load initial language flag URLs
+toggleLanguage();
 </script>
 
 <style scoped>
