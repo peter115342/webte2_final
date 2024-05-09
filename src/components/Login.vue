@@ -22,7 +22,7 @@
                   ></v-text-field>
                   <v-btn-group>
                     <v-btn type="submit" color="primary">{{ $t('login') }}</v-btn>
-                    <v-btn @click="toggleFormMode">{{ $t('register') }}</v-btn>
+                    <v-btn @click="toggleFormMode" color="background">{{ $t('register') }}</v-btn>
                   </v-btn-group>
                 </v-form>
               </template>
@@ -50,7 +50,7 @@
                   ></v-text-field>
                   <v-btn-group>
                     <v-btn type="submit" color="primary">{{ $t('register') }}</v-btn>
-                    <v-btn @click="toggleFormMode">{{ $t('backToLogin') }}</v-btn>
+                    <v-btn @click="toggleFormMode" color="background">{{ $t('backToLogin') }}</v-btn>
                   </v-btn-group>
                 </v-form>
               </template>

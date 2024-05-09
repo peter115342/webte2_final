@@ -44,7 +44,6 @@ import { useI18n } from 'vue-i18n';
 import Login from './components/Login.vue';
 import { useAppStore } from './store/app';
 
-
 const { locale } = useI18n(); 
 const store = useAppStore();
 
@@ -76,12 +75,16 @@ import enFlag from './assets/united-kingdom.png';
 let currentFlag = ref('');
 watch(locale, () => {
   currentFlag.value = locale.value === 'en' ? enFlag : skFlag;
+}); // Added closing bracket here
+
 // Function to handle logout
 const logout = () => {
   isLoggedIn.value = false;
   // Clear cookie to indicate user is logged out
   document.cookie = 'isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 };
+
+toggleLanguage();
 
 // Close the user modal when clicked outside of it
 const closeUserModal = () => {
@@ -114,8 +117,6 @@ onMounted(() => {
   });
 });
 
-// Load initial language flag URLs
-toggleLanguage();
 </script>
 
 <style scoped>
