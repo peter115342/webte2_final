@@ -23,7 +23,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-list>
-            <v-btn color="primary" @click="submitAnswers">Submit</v-btn>
+            <v-btn color="primary" @click="submitAnswers">{{ $t('submit') }}</v-btn>
           </v-card-text>
         </v-card>
       </v-col>
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     fetchQuestions() {
-  const code = "VlCPs"; // Váš zadaný "code" otázky
+  const code = "VlCPs"; //"code" otázky
 
   axios.get(`https://node19.webte.fei.stuba.sk/nemecko/api/${code}`)
     .then(response => {
@@ -84,7 +84,6 @@ export default {
       return answer !== null;
     },
     submitAnswers() {
-      // Tu môžete pridať ďalšiu logiku na spracovanie odpovedí
       console.log('Submitted answers:', this.selectedAnswers);
     }
   }

@@ -3,7 +3,7 @@
       <v-row justify="center">
         <v-col cols="12" sm="10" md="10" lg="8">
           <v-card>
-            <v-card-title class="headline">{{ formMode === 'login' ? 'Login' : 'Register' }}</v-card-title>
+            <v-card-title class="headline">{{ formMode === 'login' ?  $t('login')  :  $t('register')  }}</v-card-title>
             <v-card-text>
               <template v-if="formMode === 'login'">
                 <v-form @submit.prevent="login"> 
@@ -21,8 +21,8 @@
                     required
                   ></v-text-field>
                   <v-btn-group>
-                    <v-btn type="submit" color="primary">Login</v-btn>
-                    <v-btn @click="toggleFormMode">Register</v-btn>
+                    <v-btn type="submit" color="primary">{{ $t('login') }}</v-btn>
+                    <v-btn @click="toggleFormMode">{{ $t('register') }}</v-btn>
                   </v-btn-group>
                 </v-form>
               </template>
@@ -49,8 +49,8 @@
                     required
                   ></v-text-field>
                   <v-btn-group>
-                    <v-btn type="submit" color="primary">Register</v-btn>
-                    <v-btn @click="toggleFormMode">Back to Login</v-btn>
+                    <v-btn type="submit" color="primary">{{ $t('register') }}</v-btn>
+                    <v-btn @click="toggleFormMode">{{ $t('backToLogin') }}</v-btn>
                   </v-btn-group>
                 </v-form>
               </template>
