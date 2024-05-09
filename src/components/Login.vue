@@ -60,58 +60,60 @@
       </v-row>
     </v-container>
   </template>
-  
-  <script setup>
-  import axios from 'axios';
-import { defineEmits, ref } from 'vue';
-  
-  const formMode = ref('login');
-  const username = ref('');
-  const password = ref('');
-  const newUsername = ref('');
-  const newPassword = ref('');
-  const confirmPassword = ref('');
-  const { emit } = defineEmits(['loginSuccess', 'loginError']);
-  
-  const login = async () => {
-    try {
-      const response = await axios.post('/user/login', {
-        username: username.value,
-        password: password.value
-      });
-      if (response.data) {
-        emit('loginSuccess');
-      } else {
-        emit('loginError');
-      }
-    } catch (error) {
+
+<script setup>
+import axios from 'axios';
+import { ref, defineEmits } from 'vue';
+
+const formMode = ref('login');
+const username = ref('');
+const password = ref('');
+const newUsername = ref('');
+const newPassword = ref('');
+const confirmPassword = ref('');
+
+const emit = defineEmits(['loginSuccess', 'loginError']);
+
+const login = async () => {
+  try {
+    const response = await axios.post('https://node19.webte.fei.stuba.sk/nemecko/api/user/login', {
+      username: username.value,
+      password: password.value
+    });
+    if (response.data && response.data.access_token) {
+      document.cookie = `access_token=${response.data.access_token}; path=/`;
+      emit('loginSuccess');
+    } else {
+      console.error('Login failed. Please check your credentials.');
       emit('loginError');
     }
-  };
-  
-  const register = async () => {
-    if (newPassword.value !== confirmPassword.value) {
-      // Passwords don't match, handle error
-      return;
+  } catch (error) {
+    console.error('An error occurred during login:', error);
+    emit('loginError');
+  }
+};
+
+const register = async () => {
+  if (newPassword.value !== confirmPassword.value) {
+    console.error("Passwords don't match.");
+    return;
+  }
+  try {
+    const response = await axios.post('https://node19.webte.fei.stuba.sk/nemecko/api/user', {
+      username: newUsername.value,
+      password: newPassword.value
+    });
+    if (response.data) {
+      // Handle successful registration
+    } else {
+      console.error('Failed to register user.');
     }
-    try {
-      const response = await axios.post('/user/register', {
-        username: newUsername.value,
-        password: newPassword.value
-      });
-      if (response.data) {
-        // Optionally, you can automatically log in the user after registration
-        // or show a success message and let them manually log in
-      } else {
-        // Handle registration error
-      }
-    } catch (error) {
-      // Handle registration error
-    }
-  };
-  
-  const toggleFormMode = () => {
-    formMode.value = formMode.value === 'login' ? 'register' : 'login';
-  };
-  </script>
-  
+  } catch (error) {
+    console.error('Failed to register user.');
+  }
+};
+
+const toggleFormMode = () => {
+  formMode.value = formMode.value === 'login' ? 'register' : 'login';
+};
+</script>
