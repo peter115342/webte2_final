@@ -118,7 +118,7 @@ switch ($method) {
         // FIND USER
         elseif ($endpoint === "/user/username") {
             $data = json_decode(file_get_contents("php://input"), true);
-            $username = $userObject->findUser($data);
+            $username = $userObject->checkUsername($data);
             if($username){
                 echo json_encode(["message" => "OK"]);
                 http_response_code(200);

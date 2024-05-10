@@ -321,6 +321,28 @@ paths:
                 $ref: '#/components/schemas/Login'
         '400':
           description: Error
+  /user/username:
+    post:
+      tags:
+        - user
+      summary: Checks if username is in database
+      operationId: checkUsername
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckUser'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CheckUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckUser'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
   /user/{userId}:
     put:
       tags:
@@ -370,6 +392,13 @@ paths:
           description: Error
 components:
   schemas:
+    CheckUser:
+      type: object
+      properties:
+        username:
+          type: string
+      xml:
+        name: user
     LoginUser:
       type: object
       properties:
