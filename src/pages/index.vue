@@ -1,10 +1,9 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <HomePage />
+  <AddQuestion />
 </template>
 
 <script setup>
-import HomePage from '@/components/HomePage.vue';
 
 
   //

@@ -7,7 +7,7 @@
       <v-form @submit.prevent="submitCode">
         <v-text-field
           v-model="code"
-          label="Enter Code"
+          :label="$t('enterCode')"
           outlined
           required
         ></v-text-field>

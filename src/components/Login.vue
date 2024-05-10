@@ -9,13 +9,13 @@
               <v-form @submit.prevent="login"> 
                 <v-text-field
                   v-model="username"
-                  label="Username"
+                  :label="$t('username')"
                   outlined
                   required
                 ></v-text-field>
                 <v-text-field
                   v-model="password"
-                  label="Password"
+                  :label="$t('password')"
                   type="password"
                   outlined
                   required
@@ -30,20 +30,20 @@
               <v-form @submit.prevent="registerUser">
                 <v-text-field
                   v-model="newUsername"
-                  label="New Username"
+                  :label="$t('newUsername')"
                   outlined
                   required
                 ></v-text-field>
                 <v-text-field
                   v-model="newPassword"
-                  label="New Password"
+                  :label="$t('newPassword')"
                   type="password"
                   outlined
                   required
                 ></v-text-field>
                 <v-text-field
                   v-model="confirmPassword"
-                  label="Confirm Password"
+                  :label="$t('confirmPassword')"
                   type="password"
                   outlined
                   required
@@ -66,7 +66,7 @@
 
 <script setup>
 import axios from 'axios';
-import { ref, defineEmits } from 'vue';
+import { defineEmits, ref } from 'vue';
 
 const formMode = ref('login');
 const username = ref('');

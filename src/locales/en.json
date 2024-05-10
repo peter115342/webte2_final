@@ -5,6 +5,23 @@
     "backToLogin": "Back to login",
     "submit": "Submit",
     "loggedInAs": "Logged in as",
-    "logout": "Logout"
+    "logout": "Logout",
+    "addQuestion" : "Add question",
+    "addOption" : "Add option",
+    "changePassword": "Change password",
+    "oldPassword": "Old password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "editQuestion": "Edit, delete or copy QnA",
+    "subject": "Subject",
+    "question": "Question",
+    "type": "Type",
+    "option ": "Option ",
+    "correct ": "Correct ",
+    "username": "Username",
+    "password": "Password",
+    "newUsername": "New username",
+    "confirmPassword": "Confirm password",
+    "enterCode": "Enter code"
   }
   

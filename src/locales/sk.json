@@ -5,6 +5,23 @@
     "backToLogin": "Späť na prihlásenie",
     "submit": "Potvrdiť",
     "loggedInAs": "Prihlásený ako",
-    "logout": "Odhlásiť"
+    "logout": "Odhlásiť",
+    "addQuestion" : "Pridať otázku",
+    "addOption" : "Pridať možnosť",
+    "changePassword": "Zmeniť heslo",
+    "oldPassword": "Staré heslo",
+    "newPassword": "Nové heslo",
+    "confirmNewPassword": "Potvrdenie nového hesla",
+    "editQuestion": "Upraviť, vymazať alebo kopírovať QnA",
+    "subject": "Predmet",
+    "question": "Otázka",
+    "type": "Typ",
+    "option ": "Možnosť ",
+    "correct ": "Správne ",
+    "username": "Uživateľské meno",
+    "password": "Heslo",
+    "newUsername": "Nové uživateľské meno",
+    "confirmPassword": "Potvrdiť heslo",
+    "enterCode": "Vložiť kód"
   }
   
