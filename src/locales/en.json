@@ -5,6 +5,8 @@
     "backToLogin": "Back to login",
     "submit": "Submit",
     "loggedInAs": "Logged in as",
-    "logout": "Logout"
+    "logout": "Logout",
+    "addQuestion" : "Add question",
+    "addOption" : "Add option"
   }
   

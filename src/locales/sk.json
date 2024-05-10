@@ -5,6 +5,8 @@
     "backToLogin": "Späť na prihlásenie",
     "submit": "Potvrdiť",
     "loggedInAs": "Prihlásený ako",
-    "logout": "Odhlásiť"
+    "logout": "Odhlásiť",
+    "addQuestion" : "Pridať otázku",
+    "addOption" : "Pridať možnosť"
   }
   
