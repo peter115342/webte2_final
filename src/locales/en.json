@@ -1,8 +1,10 @@
 {
-    "appTitle": "PresentFlow EN",
+    "appTitle": "PresentFlow",
     "login": "Login",
     "register": "Register",
     "backToLogin": "Back to login",
-    "submit": "Submit"
+    "submit": "Submit",
+    "loggedInAs": "Logged in as",
+    "logout": "Logout"
   }
   

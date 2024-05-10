@@ -1,8 +1,10 @@
 {
-    "appTitle": "PresentFlow SK",
+    "appTitle": "PresentFlow",
     "login": "Prihlásenie",
     "register": "Registrácia",
     "backToLogin": "Späť na prihlásenie",
-    "submit": "Potvrdiť"
+    "submit": "Potvrdiť",
+    "loggedInAs": "Prihlásený ako",
+    "logout": "Odhlásiť"
   }
   
