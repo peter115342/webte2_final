@@ -3,6 +3,10 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: *');
 header('Access-Control-Allow-Headers: *');
 header('Content-Type: application/json');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 require_once "User.php";
 require_once "Question.php";
 require_once "config.php";
@@ -76,7 +80,7 @@ switch ($method) {
             }
         }
         // CREATE ANSWER
-        else    if ($endpoint === "/answer") {
+        elseif ($endpoint === "/answer") {
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $questionObject->createAnswer($data);
             if($result){
@@ -110,10 +114,24 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        } else {
+        }
+        // FIND USER
+        elseif ($endpoint === "/user/username") {
+            $data = json_decode(file_get_contents("php://input"), true);
+            $username = $userObject->findUser($data);
+            if($username){
+                echo json_encode(["message" => "OK"]);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }  
+        else {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
         }
+        
         break;
     case 'PUT':
         // UPDATE ANSWER
