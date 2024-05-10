@@ -56,7 +56,7 @@ class User
         }
     }
 
-    public function findUser($data)
+    public function checkUsername($data)
     {
         $username = $data['username'];
         $query = "SELECT id FROM users WHERE username = ?";  
