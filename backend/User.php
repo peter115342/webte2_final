@@ -56,6 +56,23 @@ class User
         }
     }
 
+    public function findUser($data)
+    {
+        $username = $data['username'];
+        $query = "SELECT id FROM users WHERE username = ?";  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $stmt->close();
+        if ($user) {
+            return true; 
+        } else {
+            return false;
+        }
+    }
+
     public function createUser($data)
     {
         $username = $data['username'];
