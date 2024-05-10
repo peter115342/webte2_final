@@ -11,20 +11,20 @@
               <v-form @submit.prevent="submitQuestion">
                 <v-text-field
                   v-model="subject"
-                  label="Subject"
+                 :label="$t('subject')"
                   outlined
                   required
                 ></v-text-field>
                 <v-textarea
                   v-model="question"
-                  label="Question"
+                  :label="$t('question')"
                   outlined
                   required
                 ></v-textarea>
                 <v-select
                   v-model="selectedType"
                   :items="['Multiple Choice', 'Short Answer']"
-                  label="Type"
+                  :label="$t('type')"
                   outlined
                   required
                 ></v-select>
@@ -32,13 +32,13 @@
                   <template v-for="(option, index) in options" :key="index">
                     <v-text-field
                       v-model="options[index].text"
-                      :label="'Option ' + (index + 1)"
+                      :label="$t('option ') + (index + 1)"
                       outlined
                       required
                     ></v-text-field>
                     <v-checkbox
                       v-model="options[index].correct"
-                      :label="'Correct ' + (index + 1)"
+                      :label="$t('correct ') + (index + 1)"
                       value="true"
                     ></v-checkbox>
                   </template>

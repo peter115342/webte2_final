@@ -10,7 +10,7 @@
           <v-card>
             <v-card-text>
               <!-- Login component emits accessToken -->
-              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username = "saveUsername" />
+              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" />
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -19,12 +19,12 @@
         <v-btn icon @click="showUserModal = !showUserModal">
           <v-icon>mdi-account-circle</v-icon>
         </v-btn>
-        <v-dialog v-model="showUserModal" max-width="300"  persistent @click:outside="closeUserModal" content-class="user-modal">
+        <v-dialog v-model="showUserModal" max-width="300" persistent @click:outside="closeUserModal" content-class="user-modal">
           <template v-slot:activator="{ on }"></template>
           <v-card>
-            <v-card-title>{{ $t('loggedInAs') }} {{ getUsernameFromLocalStorage()}}</v-card-title>
+            <v-card-title>{{ $t('loggedInAs') }} {{ getUsernameFromLocalStorage() }}</v-card-title>
             <v-card-actions>
-              <v-btn    class="logout-button" @click="logout">{{ $t('logout') }}</v-btn>
+              <v-btn class="logout-button" @click="logout">{{ $t('logout') }}</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -34,6 +34,34 @@
       </v-btn>
     </v-app-bar>
 
+    <!-- Navigation drawer visible only for authenticated users -->
+    <template v-if="hasAccessToken">
+      <v-navigation-drawer location="right" permanent>
+  <v-divider></v-divider>
+  <v-list dense nav>
+    <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" value="addQuestion"></v-list-item>
+    <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" value="edit"></v-list-item>
+    <v-list-item prepend-icon="mdi-lock" :title="$t('changePassword')" value="changePassword" @click="showChangePasswordForm = true"></v-list-item>
+  </v-list>
+</v-navigation-drawer>
+
+<v-dialog v-model="showChangePasswordForm" max-width="500">
+  <v-card>
+    <v-card-title>{{ $t('changePassword') }}</v-card-title>
+    <v-card-text>
+      <!-- Form to change password -->
+      <v-form @submit.prevent="changePassword">
+        <v-text-field v-model="oldPassword" :label="$t('oldPassword')" type="password"></v-text-field>
+        <v-text-field v-model="newPassword" :label="$t('newPassword')" type="password"></v-text-field>
+        <v-text-field v-model="confirmNewPassword" :label="$t('confirmNewPassword')" type="password"></v-text-field>
+        <v-btn type="submit" color="primary">{{ $t('changePassword') }}</v-btn>
+      </v-form>
+    </v-card-text>
+  </v-card>
+</v-dialog>
+
+    </template>
+
     <v-main>
       <router-view />
     </v-main>
@@ -41,7 +69,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Login from './components/Login.vue';
 
@@ -51,13 +79,22 @@ const { locale } = useI18n();
 const showLoginForm = ref(false);
 const showUserModal = ref(false);
 const cookieValue = ref(document.cookie);
+const showChangePasswordForm = ref(false);
+const oldPassword = ref('');
+const newPassword = ref('');
+const confirmNewPassword = ref('');
+
+
+// Function to handle password change
+const changePassword = () => {
+  // Implement password change logic here
+};
 
 // Handle successful login
 const handleLoginSuccess = () => {
   showLoginForm.value = false;
   handleAccessToken(cookieValue.value.split('=')[1]);
   window.location.reload();
-
 };
 const saveUsername = (username) => {
   localStorage.setItem('username', username);
@@ -151,7 +188,7 @@ const hasAccessToken = computed(() => {
 }
 
 .user-modal .v-dialog {
-  position: absolute !important ;
+  position: absolute !important;
   top: 0 !important;
   right: 0;
   z-index: 1000;
