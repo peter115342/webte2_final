@@ -21,36 +21,8 @@ $endpoint = $params['endpoint'];
 $endpoint = '/' . $endpoint;
 switch ($method) {
     case 'GET':
-        // GET ALL USERS
-        if ($endpoint ===  "/user") {
-            $users = $userObject->getAllUsers();
-            http_response_code(200);
-            echo json_encode($users);
-        }
-        // GET ALL QUESTIONS BY USER
-        elseif (preg_match("/^\/question\/user\/(\d+)$/", $endpoint, $matches)) {
-            $id = $matches[1];
-            $questions = $questionObject->getQuestionsByUserId($id);
-            http_response_code(200);
-            echo json_encode($questions);
-        }
-        // GET ALL ANSWERS TO QUESTION
-        elseif (preg_match("/^\/question\/(\d+)\/answers$/", $endpoint, $matches)) {
-            $question_id = $matches[1];
-            $answers = $questionObject->getAllQuestionAnswers($question_id);
-            http_response_code(200);
-            echo json_encode($answers);
-        }
-        // QUESTION BY ID
-        elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
-            $id = $matches[1];
-            $question = $questionObject->getQuestionById($id);
-            http_response_code(200);
-            echo json_encode($question);
-        }
-
         // QUESTION BY CODE
-        elseif (preg_match("/^\/([a-zA-Z0-9]{5})$/", $endpoint, $matches)) {
+        if (preg_match("/^\/([a-zA-Z0-9]{5})$/", $endpoint, $matches)) {
             $code = $matches[1];
             $question = $questionObject->getQuestionByCode($code);
             http_response_code(200);
@@ -62,8 +34,59 @@ switch ($method) {
         }
         break;
     case 'POST':
+        // GET ALL QUESTIONS BY USER
+        if (preg_match("/^\/question\/user\/(\d+)$/", $endpoint, $matches)) {
+            $id = $matches[1];
+            $data = json_decode(file_get_contents("php://input"), true);
+            $questions = $questionObject->getQuestionsByUserId($id, $data);
+            if($questions){
+                echo json_encode($questions);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
+        // GET ALL ANSWERS TO QUESTION
+        elseif (preg_match("/^\/question\/(\d+)\/answers$/", $endpoint, $matches)) {
+            $question_id = $matches[1];
+            $data = json_decode(file_get_contents("php://input"), true);
+            $answers = $questionObject->getAllQuestionAnswers($question_id, $data);
+            if($answers){
+                echo json_encode($answers);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
+        // QUESTION BY ID
+        elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
+            $id = $matches[1];
+            $data = json_decode(file_get_contents("php://input"), true);
+            $question = $questionObject->getQuestionById($id, $data);
+            if($question){
+                echo json_encode($question);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
+         // GET ALL USERS
+        elseif ($endpoint ===  "/user/list") {
+            $data = json_decode(file_get_contents("php://input"), true);
+            $users = $userObject->getAllUsers($data);
+            if($users){
+                echo json_encode($users);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
          // LOGIN USER
-         if ($endpoint ===  "/user/login") {
+        elseif ($endpoint ===  "/user/login") {
             $data = json_decode(file_get_contents("php://input"), true);
             if (empty($data)) {
                 http_response_code(400);
@@ -115,18 +138,43 @@ switch ($method) {
                 http_response_code(400);
             }
         }
-        // FIND USER
+        // CHECK USERNAME
         elseif ($endpoint === "/user/username") {
             $data = json_decode(file_get_contents("php://input"), true);
-            $username = $userObject->checkUsername($data);
-            if($username){
+            $result = $userObject->checkUsername($data);
+            if($result){
                 echo json_encode(["message" => "OK"]);
                 http_response_code(200);
             } else {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
+        }
+         // CHECK ACCESS TOKEN
+         elseif ($endpoint === "/user/access") {
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $userObject->checkAcessToken($data);
+            if($result){
+                echo json_encode($result);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
         }  
+        
+         // LOGOUT
+         elseif ($endpoint === "/user/logout") {
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $userObject->logout($data);
+            if($result){
+                echo json_encode(["message" => "OK"]);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }    
         else {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
@@ -182,7 +230,8 @@ switch ($method) {
         // DELETE ANSWER
         if (preg_match("/^\/answer\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
-            $result = $questionObject->deleteAnswer($id);
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $questionObject->deleteAnswer($id, $data);
             if($result){
                 echo json_encode(["message" => "OK"]);
                 http_response_code(200);
@@ -194,7 +243,8 @@ switch ($method) {
         // DELETE QUESTION
         elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
-            $result = $questionObject->deleteQuestion($id);
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $questionObject->deleteQuestion($id, $data);
             if($result){
                 echo json_encode(["message" => "OK"]);
                 http_response_code(200);
@@ -206,7 +256,8 @@ switch ($method) {
         // DELETE USER
         elseif (preg_match("/^\/user\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
-            $result = $userObject->deleteUser($id);
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $userObject->deleteUser($id, $data);
             if($result){
                 echo json_encode(["message" => "OK"]);
                 http_response_code(200);
@@ -223,6 +274,4 @@ switch ($method) {
     default:
         http_response_code(405);
         echo json_encode(["message" => "Method not allowed"]);
-
-
 }
