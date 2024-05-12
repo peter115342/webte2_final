@@ -174,7 +174,45 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        }    
+        } // DELETE ANSWER
+        elseif (preg_match("/^\/answer\/(\d+)$/", $endpoint, $matches)) {
+            $id = $matches[1];
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $questionObject->deleteAnswer($id, $data);
+            if($result){
+                echo json_encode(["message" => "OK"]);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
+        // DELETE QUESTION
+        elseif (preg_match("/^\/delete\/question\/(\d+)$/", $endpoint, $matches)) {
+            $id = $matches[1];
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $questionObject->deleteQuestion($id, $data);
+            if($result){
+                echo json_encode(["message" => "OK"]);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
+        // DELETE USER
+        elseif (preg_match("/^\/delete\/user\/(\d+)$/", $endpoint, $matches)) {
+            $id = $matches[1];
+            $data = json_decode(file_get_contents("php://input"), true);
+            $result = $userObject->deleteUser($id, $data);
+            if($result){
+                echo json_encode(["message" => "OK"]);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }   
         else {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
@@ -183,7 +221,7 @@ switch ($method) {
         break;
     case 'PUT':
         // UPDATE ANSWER
-        if (preg_match("/^\/answer\/(\d+)$/", $endpoint, $matches)) {
+        if (preg_match("/^\/delete\/answer\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $questionObject->updateAnswer($id, $data);
@@ -225,52 +263,7 @@ switch ($method) {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
         }
-        break;
-    case 'DELETE':
-        // DELETE ANSWER
-        if (preg_match("/^\/answer\/(\d+)$/", $endpoint, $matches)) {
-            $id = $matches[1];
-            $data = json_decode(file_get_contents("php://input"), true);
-            $result = $questionObject->deleteAnswer($id, $data);
-            if($result){
-                echo json_encode(["message" => "OK"]);
-                http_response_code(200);
-            } else {
-                echo json_encode(["message" => "Error"]);
-                http_response_code(400);
-            }
-        }
-        // DELETE QUESTION
-        elseif (preg_match("/^\/question\/(\d+)$/", $endpoint, $matches)) {
-            $id = $matches[1];
-            $data = json_decode(file_get_contents("php://input"), true);
-            $result = $questionObject->deleteQuestion($id, $data);
-            if($result){
-                echo json_encode(["message" => "OK"]);
-                http_response_code(200);
-            } else {
-                echo json_encode(["message" => "Error"]);
-                http_response_code(400);
-            }
-        }
-        // DELETE USER
-        elseif (preg_match("/^\/user\/(\d+)$/", $endpoint, $matches)) {
-            $id = $matches[1];
-            $data = json_decode(file_get_contents("php://input"), true);
-            $result = $userObject->deleteUser($id, $data);
-            if($result){
-                echo json_encode(["message" => "OK"]);
-                http_response_code(200);
-            } else {
-                echo json_encode(["message" => "Error"]);
-                http_response_code(400);
-            }
-        }
-        else {
-            http_response_code(400);
-            echo json_encode(["message" => "Bad request"]);
-        }
-        break;
+        break;  
     default:
         http_response_code(405);
         echo json_encode(["message" => "Method not allowed"]);
