@@ -28,7 +28,7 @@ paths:
         '400':
           description: Error
   
-  /delete/answer/{answerId}:
+  /answer/delete/{answerId}:
     post:
       tags:
         - answer
@@ -199,7 +199,7 @@ paths:
                     type: string    # Added code property
         '400':
           description: Error
-  /delete/question/{questionId}:  
+  /question/delete/{questionId}:  
     post:
       tags:
         - question
@@ -402,7 +402,7 @@ paths:
           description: OK
         '400':
           description: Error
-  /delete/user/{userId}:
+  /user/delete/{userId}:
     post:
       tags:
         - user
