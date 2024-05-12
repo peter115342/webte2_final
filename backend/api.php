@@ -27,6 +27,18 @@ switch ($method) {
             $question = $questionObject->getQuestionByCode($code);
             http_response_code(200);
             echo json_encode($question);
+        }        
+        // GET ALL ANSWERS TO QUESTION
+        elseif (preg_match("/^\/question\/(\d+)\/answers$/", $endpoint, $matches)) {
+            $question_id = $matches[1];
+            $answers = $questionObject->getAllQuestionAnswers($question_id);
+            if($answers){
+                echo json_encode($answers);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
         }
         else {
             http_response_code(400);
@@ -41,19 +53,6 @@ switch ($method) {
             $questions = $questionObject->getQuestionsByUserId($id, $data);
             if($questions){
                 echo json_encode($questions);
-                http_response_code(200);
-            } else {
-                echo json_encode(["message" => "Error"]);
-                http_response_code(400);
-            }
-        }
-        // GET ALL ANSWERS TO QUESTION
-        elseif (preg_match("/^\/question\/(\d+)\/answers$/", $endpoint, $matches)) {
-            $question_id = $matches[1];
-            $data = json_decode(file_get_contents("php://input"), true);
-            $answers = $questionObject->getAllQuestionAnswers($question_id, $data);
-            if($answers){
-                echo json_encode($answers);
                 http_response_code(200);
             } else {
                 echo json_encode(["message" => "Error"]);
