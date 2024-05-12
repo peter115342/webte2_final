@@ -27,6 +27,39 @@ paths:
           description: OK
         '400':
           description: Error
+  
+  /delete/answer/{answerId}:
+    post:
+      tags:
+        - answer
+      summary: Delete an answer
+      description: Delete an answer
+      operationId: deleteAnswer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+        required: true
+      parameters:
+        - name: answerId
+          in: path
+          description: Answer id to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
   /answer/{answerId}:
     put:
       tags:
@@ -59,16 +92,40 @@ paths:
           description: OK
         '400':
           description: Error
-    delete:
+  /{code}:
+    get:
       tags:
-        - answer
-      summary: Delete an answer
-      description: Delete an answer
-      operationId: deleteAnswer
+        - question
+      summary: Get question with code
+      operationId: getQuestionWithCode
       parameters:
-        - name: answerId
+        - name: code
           in: path
-          description: Answer id to be deleted
+          description: Code of the question to be fetched
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQuestion'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /question/{questionId}/answers:
+    get:
+      tags:
+        - question
+      summary: Get all answers to a question
+      operationId: getAllQuestionAnswers
+      parameters:
+        - name: questionId
+          in: path
+          description: Fetch this QuestionId's answers
           required: true
           schema:
             type: integer
@@ -76,10 +133,17 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAnswers'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/GetAnswers'
         '400':
           description: Error
   /question/user/{userId}:
-    get:
+    post:
       tags:
         - question
       summary: Get question with user id
@@ -135,40 +199,28 @@ paths:
                     type: string    # Added code property
         '400':
           description: Error
-  /{code}:
-    get:
+  /delete/question/{questionId}:  
+    post:
       tags:
         - question
-      summary: Get question with code
-      operationId: getQuestionWithCode
-      parameters:
-        - name: code
-          in: path
-          description: Code of the question to be fetched
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetQuestion'
-        '400':
-          description: Invalid input
-        '422':
-          description: Validation exception
-  /question/{questionId}/answers:
-    get:
-      tags:
-        - question
-      summary: Get all answers to a question
-      operationId: getAllQuestionAnswers
+      summary: Delete question by id
+      operationId: deleteQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+        required: true
       parameters:
         - name: questionId
           in: path
-          description: Fetch this QuestionId's answers
+          description: ID of the question to be deleted
           required: true
           schema:
             type: integer
@@ -176,21 +228,26 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetAnswers'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/GetAnswers'
         '400':
           description: Error
   /question/{questionId}:
-    get:
+    post:
       tags:
         - question
       summary: Get question by id
       operationId: getQuestionbyId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+        required: true
       parameters:
         - name: questionId
           in: path
@@ -241,31 +298,24 @@ paths:
           description: OK
         '400':
           description: Error
-    delete:
-      tags:
-        - question
-      summary: Delete question by id
-      operationId: deleteQuestion
-      parameters:
-        - name: questionId
-          in: path
-          description: ID of the question to be deleted
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Error
-  
-  /user:
-    get:
+  /user/list:
+    post:
       tags:
         - user
       summary: Get all users
       operationId: getUsers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+        required: true
       responses:
         '200':
           description: OK
@@ -278,6 +328,7 @@ paths:
                 $ref: '#/components/schemas/GetUser'
         '400':
           description: Error
+  /user:
     post:
       tags:
         - user
@@ -351,6 +402,36 @@ paths:
           description: OK
         '400':
           description: Error
+  /delete/user/{userId}:
+    post:
+      tags:
+        - user
+      summary: Delete user
+      operationId: deleteUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+        required: true
+      parameters:
+        - name: userId
+          description: Id of user that need to be deleted
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Error
   /user/{userId}:
     put:
       tags:
@@ -381,25 +462,16 @@ paths:
           description: OK
         '400':
           description: Error
-    delete:
-      tags:
-        - user
-      summary: Delete user
-      operationId: deleteUser
-      parameters:
-        - name: userId
-          description: Id of user that need to be deleted
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Error
+  
 components:
   schemas:
+    AccessToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+      xml:
+        name: user
     CheckUser:
       type: object
       properties:
@@ -419,6 +491,8 @@ components:
     GetQuestionsByUserId:
       type: object
       properties:
+        access_token:
+          type: string
         question_id:
           type: integer
         date:
@@ -448,9 +522,14 @@ components:
     GetAnswers:
       type: object
       properties:
+      
+        id:
+          type: integer
         answer:
           type: string
         count:
+          type: integer
+        correct:
           type: integer
       xml:
         name: answer
@@ -478,6 +557,8 @@ components:
     User:
       type: object
       properties:
+        access_token:
+          type: string
         username:
           type: string
         password:
@@ -513,6 +594,8 @@ components:
     PutAnswer:
       type: object
       properties:
+        access_token:
+          type: string
         correct:
           type: integer
           format: int1
@@ -523,6 +606,8 @@ components:
     PutQuestion:
       type: object
       properties:
+        access_token:
+          type: string
         subject:
           type: string
         question:
@@ -534,6 +619,8 @@ components:
     PostQuestion:
       type: object
       properties:
+        access_token:
+          type: string
         subject:
           type: string
         question:
