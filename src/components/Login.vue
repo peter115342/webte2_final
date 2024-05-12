@@ -85,7 +85,7 @@ const login = async () => {
   }
   
   try {
-    const response = await axios.post('https://node19.webte.fei.stuba.sk/nemecko/api/user/login', {
+    const response = await axios.post('https://node79.webte.fei.stuba.sk/final/api/user/login', {
       username: username.value,
       password: password.value
     });
@@ -119,7 +119,7 @@ const registerUser = async () => {
   }
   
   try {
-    const response = await axios.post('https://node19.webte.fei.stuba.sk/nemecko/api/user', {
+    const response = await axios.post('https://node79.webte.fei.stuba.sk/final/api/user', {
       username: newUsername.value,
       password: newPassword.value,
       administrator: false

@@ -4,6 +4,9 @@
 </template>
 
 <script setup>
+import AddQuestion from '@/components/AddQuestion.vue';
+import HomePage from '@/components/HomePage.vue';
+
 
 
   //
