@@ -56,25 +56,18 @@ class Question
         return $this->isUserAuthorized($accessToken, $questionId);
     }
 
-    public function getAllQuestionAnswers($question_id, $data)
+    public function getAllQuestionAnswers($question_id)
     {
-        $accessToken = $data['access_token'];
-        $accessTokenData = $this->checkAcessToken($accessToken);
-        $role = $accessTokenData['role'];
-        if (($role === 'admin') || ($role === 'user' && $this->isUserAuthorized($accessToken, $question_id))) {
-            $query = "SELECT id, answer, count, correct FROM answers WHERE question_id = ?";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("i", $question_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            while ($row = mysqli_fetch_assoc($result)) {
-                $answers[] = $row;
-            }
-            $stmt->close();
-            return $answers;
-        } else {
-            return false;
+        $query = "SELECT id, answer, count, correct FROM answers WHERE question_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $question_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $answers[] = $row;
         }
+        $stmt->close();
+        return $answers;
     }
 
     public function getQuestionsByUserId($user_id, $data)
