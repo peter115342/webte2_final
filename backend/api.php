@@ -175,7 +175,7 @@ switch ($method) {
                 http_response_code(400);
             }
         } // DELETE ANSWER
-        elseif (preg_match("/^\/answer\/(\d+)$/", $endpoint, $matches)) {
+        elseif (preg_match("/^\/answer\/delete\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $questionObject->deleteAnswer($id, $data);
@@ -188,7 +188,7 @@ switch ($method) {
             }
         }
         // DELETE QUESTION
-        elseif (preg_match("/^\/delete\/question\/(\d+)$/", $endpoint, $matches)) {
+        elseif (preg_match("/^\/question\/delete\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $questionObject->deleteQuestion($id, $data);
@@ -201,7 +201,7 @@ switch ($method) {
             }
         }
         // DELETE USER
-        elseif (preg_match("/^\/delete\/user\/(\d+)$/", $endpoint, $matches)) {
+        elseif (preg_match("/^\/user\/delete\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $userObject->deleteUser($id, $data);
@@ -221,7 +221,7 @@ switch ($method) {
         break;
     case 'PUT':
         // UPDATE ANSWER
-        if (preg_match("/^\/delete\/answer\/(\d+)$/", $endpoint, $matches)) {
+        if (preg_match("/^\/answer\/(\d+)$/", $endpoint, $matches)) {
             $id = $matches[1];
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $questionObject->updateAnswer($id, $data);
