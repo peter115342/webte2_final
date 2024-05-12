@@ -48,7 +48,7 @@ export default {
     fetchQuestions() {
   const code = "VlCPs"; //"code" otázky
 
-  axios.get(`https://node19.webte.fei.stuba.sk/nemecko/api/${code}`)
+  axios.get(`https://node79.webte.fei.stuba.sk/final/api/${code}`)
     .then(response => {
       const responseData = response.data;
       if (typeof responseData === 'object' && responseData !== null) {
@@ -59,7 +59,7 @@ export default {
           answers: [{ answer: questionData.answer }]
         }));
         this.questions.forEach(question => {
-          axios.get(`https://node19.webte.fei.stuba.sk/nemecko/api/question/${question.question_id}/answers`)
+          axios.get(`https://node79.webte.fei.stuba.sk/final/api/question/${question.question_id}/answers`)
             .then(response => {
               // Pridanie odpovedí k danej otázke
               question.answers = response.data.map(answerData => ({

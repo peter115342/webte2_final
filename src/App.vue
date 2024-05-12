@@ -71,6 +71,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import axios from 'axios'; // Import axios for making HTTP requests
 import Login from './components/Login.vue';
 
 const { locale } = useI18n();
@@ -84,7 +85,6 @@ const oldPassword = ref('');
 const newPassword = ref('');
 const confirmNewPassword = ref('');
 
-
 // Function to handle password change
 const changePassword = () => {
   // Implement password change logic here
@@ -94,6 +94,7 @@ const changePassword = () => {
 const handleLoginSuccess = () => {
   showLoginForm.value = false;
   handleAccessToken(cookieValue.value.split('=')[1]);
+  getUsersAndSaveUserId(getUsernameFromLocalStorage());
   window.location.reload();
 };
 const saveUsername = (username) => {
@@ -104,7 +105,7 @@ const getUsernameFromLocalStorage = () => {
 };
 // Handle login error
 const handleLoginError = () => {
-  // Handle login error, show message or take appropriate action
+  // Implement error handling logic here
 };
 
 // Handle successful user registration
@@ -114,11 +115,13 @@ const handleRegisterSuccess = () => {
   }, 2500);
 };
 
-// Handle received access token
 const handleAccessToken = (accessToken) => {
   if (isValidAccessToken(accessToken)) {
-    // Set the access token cookie
     document.cookie = `access_token=${accessToken}; path=/;`;
+    const username = getUsernameFromLocalStorage();
+    if (username) {
+      getUsersAndSaveUserId(username);
+    }
   }
 };
 
@@ -157,6 +160,7 @@ const isValidAccessToken = (access_token) => {
 const logout = () => {
   document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   localStorage.removeItem('username');
+  localStorage.removeItem('userId');
   window.location.reload();
 };
 
@@ -173,7 +177,23 @@ onMounted(() => {
 const hasAccessToken = computed(() => {
   return isValidAccessToken(cookieValue.value.split('=')[1]);
 });
+
+// Function to get all users and save the ID corresponding to the username in local storage
+const getUsersAndSaveUserId = (username) => {
+  axios.get('https://node79.webte.fei.stuba.sk/final/api/user')
+    .then(response => {
+      const users = response.data;
+      const user = users.find(user => user.username === username);
+      if (user) {
+        localStorage.setItem('userId', user.id);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching users:', error);
+    });
+};
 </script>
+
 
 <style scoped>
 .title {
