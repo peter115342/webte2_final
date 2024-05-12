@@ -11,7 +11,7 @@
             <v-form @submit.prevent="submitQuestion">
               <v-text-field
                 v-model="subject"
-               :label="$t('subject')"
+                :label="$t('subject')"
                 outlined
                 required
               ></v-text-field>
@@ -30,6 +30,9 @@
               ></v-select>
               <template v-if="selectedType === 'Multiple Choice'">
                 <template v-for="(option, index) in options" :key="index">
+                  <v-icon v-if="options.length > 1 && index === options.length - 1" @click="removeOption(index)" color="red" size="24">mdi-minus</v-icon>
+                  <v-icon v-if="index === options.length - 1" @click="addOption" color="green" size="24">mdi-plus</v-icon>
+
                   <v-text-field
                     v-model="options[index].text"
                     :label="$t('option ') + (index + 1)"
@@ -39,10 +42,9 @@
                   <v-checkbox
                     v-model="options[index].correct"
                     :label="$t('correct ') + (index + 1)"
-                    value="true"
+                    :value="true"
                   ></v-checkbox>
                 </template>
-                <v-btn @click="addOption" color="primary" class="mr-4" small>{{ $t('addOption') }}</v-btn>
               </template>
               <v-btn-group>
                 <v-btn type="submit" color="primary" small>{{ $t('submit') }}</v-btn>
@@ -80,12 +82,11 @@ export default {
   },
   methods: {
     async submitQuestion() {
-      // Prepare payload based on selected type
       let payload = {
         subject: this.subject,
         question: this.question,
         type: this.selectedType === 'Multiple Choice' ? 'multiple_choice' : 'open_ended',
-        user_id: 5 // Replace with actual user id
+        user_id: localStorage.getItem('userId')
       };
       
       if (this.selectedType === 'Multiple Choice') {
@@ -102,15 +103,67 @@ export default {
         });
 
         if (response.ok) {
-          this.showSnackbar('Question added successfully!', 'success');
+          const questionId = await this.getQuestionsByUserId(localStorage.getItem('userId'));
+          
+          if (questionId) {
+            for (const option of this.options) {
+              await this.createAnswer(questionId, option.text, option.correct);
+            }
+          }
+
+          this.showSnackbar(this.$t('questionAddedSuccess'), 'success');
           this.resetForm();
         } else {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to add question');
+          throw new Error(errorData.message || this.$t('failedAddQuestion'));
         }
       } catch (error) {
         console.error('Error:', error);
-        this.showSnackbar('Failed to add question. Please try again.', 'error');
+        this.showSnackbar(this.$t('failedAddQuestionRetry'), 'error');
+      }
+    },
+    async getQuestionsByUserId(userId) {
+      try {
+        const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const questions = await response.json();
+          const highestQuestion = questions.reduce((maxQuestion, question) => {
+            return question.question_id > maxQuestion.question_id ? question : maxQuestion;
+          }, questions[0]);
+          return highestQuestion.question_id;
+        } else {
+          throw new Error('Failed to fetch user questions');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        return null;
+      }
+    },
+    async createAnswer(questionId, answerText, correct) {
+      try {
+        const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            correct: correct,
+            question_id: questionId,
+            answer: answerText
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to add answer');
+        }
+      } catch (error) {
+        console.error('Error adding answer:', error);
       }
     },
     resetForm() {
@@ -128,6 +181,9 @@ export default {
     },
     addOption() {
       this.options.push({ text: '', correct: false });
+    },
+    removeOption(index) {
+      this.options.splice(index, 1);
     }
   }
 };
