@@ -43,6 +43,7 @@ class User
         LEFT JOIN types ON answers.type_id = types.id";
         */
         $accessToken = $data['access_token'];
+        echo $accessToken;
         $accessTokenData = $this->checkAcessToken($accessToken);
         if (!$accessTokenData) {
             return false;

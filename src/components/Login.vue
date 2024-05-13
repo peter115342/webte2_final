@@ -87,11 +87,13 @@ const login = async () => {
   try {
     const response = await axios.post('https://node79.webte.fei.stuba.sk/final/api/user/login', {
       username: username.value,
-      password: password.value
+      password: password.value,
     });
+    console.log(response.data);
     if (response.data && response.data.access_token && isValidAccessToken(response.data.access_token)) {
       emit('accessToken', response.data.access_token);
       emit('username', username.value);
+      emit('id', response.data.id);
       emit('loginSuccess');
     } else {
       console.error('Login failed. Please check your credentials.');

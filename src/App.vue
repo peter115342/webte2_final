@@ -10,7 +10,7 @@
           <v-card>
             <v-card-text>
               <!-- Login component emits accessToken -->
-              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" />
+              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId" />
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -71,7 +71,6 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import axios from 'axios'; // Import axios for making HTTP requests
 import Login from './components/Login.vue';
 
 const { locale } = useI18n();
@@ -89,13 +88,14 @@ const confirmNewPassword = ref('');
 const changePassword = () => {
   // Implement password change logic here
 };
-
+const saveUserId = (id) => {
+  localStorage.setItem('userId', id);
+}
 // Handle successful login
 const handleLoginSuccess = () => {
   showLoginForm.value = false; 
   handleAccessToken(cookieValue.value.split('=')[1]);
-  getUsersAndSaveUserId(getUsernameFromLocalStorage());
-  //window.location.reload();
+  window.location.reload();
 };
 const saveUsername = (username) => {
   localStorage.setItem('username', username);
@@ -118,10 +118,6 @@ const handleRegisterSuccess = () => {
 const handleAccessToken = (accessToken) => {
   if (isValidAccessToken(accessToken)) {
     document.cookie = `access_token=${accessToken}; path=/;`;
-    const username = getUsernameFromLocalStorage();
-    if (username) {
-      getUsersAndSaveUserId(username);
-    }
   }
 };
 
@@ -177,36 +173,7 @@ onMounted(() => {
 const hasAccessToken = computed(() => {
   return isValidAccessToken(cookieValue.value.split('=')[1]);
 });
-const getUsersAndSaveUserId = (username) => {
-  try {
-    const accessToken = cookieValue.value.split('=')[1];
-    console.log(accessToken);
-    axios.post('https://node79.webte.fei.stuba.sk/final/api/user/list', { access_token: accessToken })
-      .then(response => {
-        const responseData = response.data;
-        // Check if responseData is an array
-        if (Array.isArray(responseData)) {
-          const user = responseData.find(user => user.username === username);
-          if (user) {
-            localStorage.setItem('userId', user.id);
-          }
-        } else if (typeof responseData === 'object' && responseData !== null) {
-          // If responseData is an object, try to extract user data from it
-          const user = responseData.username === username ? responseData : null;
-          if (user) {
-            localStorage.setItem('userId', user.id);
-          }
-        } else {
-          console.error('Unexpected response data format:', responseData);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching users:', error);
-      });
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
+
 
 </script>
 
