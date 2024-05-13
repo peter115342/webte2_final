@@ -92,10 +92,10 @@ const changePassword = () => {
 
 // Handle successful login
 const handleLoginSuccess = () => {
-  showLoginForm.value = false;
+  showLoginForm.value = false; 
   handleAccessToken(cookieValue.value.split('=')[1]);
   getUsersAndSaveUserId(getUsernameFromLocalStorage());
-  window.location.reload();
+  //window.location.reload();
 };
 const saveUsername = (username) => {
   localStorage.setItem('username', username);
@@ -177,21 +177,37 @@ onMounted(() => {
 const hasAccessToken = computed(() => {
   return isValidAccessToken(cookieValue.value.split('=')[1]);
 });
-
-// Function to get all users and save the ID corresponding to the username in local storage
 const getUsersAndSaveUserId = (username) => {
-  axios.get('https://node79.webte.fei.stuba.sk/final/api/user')
-    .then(response => {
-      const users = response.data;
-      const user = users.find(user => user.username === username);
-      if (user) {
-        localStorage.setItem('userId', user.id);
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching users:', error);
-    });
+  try {
+    const accessToken = cookieValue.value.split('=')[1];
+    console.log(accessToken);
+    axios.post('https://node79.webte.fei.stuba.sk/final/api/user/list', { access_token: accessToken })
+      .then(response => {
+        const responseData = response.data;
+        // Check if responseData is an array
+        if (Array.isArray(responseData)) {
+          const user = responseData.find(user => user.username === username);
+          if (user) {
+            localStorage.setItem('userId', user.id);
+          }
+        } else if (typeof responseData === 'object' && responseData !== null) {
+          // If responseData is an object, try to extract user data from it
+          const user = responseData.username === username ? responseData : null;
+          if (user) {
+            localStorage.setItem('userId', user.id);
+          }
+        } else {
+          console.error('Unexpected response data format:', responseData);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
+      });
+  } catch (error) {
+    console.error('Error:', error);
+  }
 };
+
 </script>
 
 

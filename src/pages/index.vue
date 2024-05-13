@@ -4,6 +4,8 @@
 </template>
 
 <script setup>
+import EditCopyDelete from '@/components/EditCopyDelete.vue';
+
 
 
 

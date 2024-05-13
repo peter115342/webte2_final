@@ -81,82 +81,97 @@
       }
     },
     mounted() {
-      this.fetchQuestions();
+      this.fetchQuestionsByUserId(localStorage.getItem('userId'));
     },
     methods: {
-      fetchQuestions() {
-        const userId = 5; // Change this to the appropriate user ID
-        fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`)
-          .then(response => response.json())
-          .then(data => {
-            this.questions = data;
-          })
-          .catch(error => {
-            console.error('Error fetching questions:', error);
-          });
-      },
-      deleteAnswers(questionId) {
-        return fetch(`https://node79.webte.fei.stuba.sk/final/api/question/${questionId}/answers`)
-          .then(response => response.json())
-          .then(data => {
-            // Iterate over answers and delete each one
-            const promises = data.map(answer => {
-              return fetch(`https://node79.webte.fei.stuba.sk/final/api/answer/${answer.id}`, {
-                method: 'DELETE'
-              });
-            });
-            return Promise.all(promises);
-          });
-      },
-      deleteQuestion(question) {
-        const questionId = question.question_id;
-        if (question.type === 'multiple_choice') {
-          // Delete all answers associated with the question first
-          this.deleteAnswers(questionId).then(() => {
-            // Now delete the question
-            fetch(`https://node79.webte.fei.stuba.sk/final/api/question/${questionId}`, {
-              method: 'DELETE'
-            })
-            .then(response => {
-              if (response.ok) {
-                // Remove the question from the local array
-                const index = this.questions.findIndex(q => q.question_id === questionId);
-                if (index !== -1) {
-                  this.questions.splice(index, 1);
-                }
-                // Fetch updated list of questions after deletion
-                this.fetchQuestions();
-              } else {
-                console.error('Failed to delete question:', response.statusText);
-              }
-            })
-            .catch(error => {
-              console.error('Error deleting question:', error);
-            });
-          });
-        } else {
-          // Now delete the question
-          fetch(`https://node79.webte.fei.stuba.sk/final/api/question/${questionId}`, {
-            method: 'DELETE'
-          })
-          .then(response => {
-            if (response.ok) {
-              // Remove the question from the local array
-              const index = this.questions.findIndex(q => q.question_id === questionId);
-              if (index !== -1) {
-                this.questions.splice(index, 1);
-              }
-              // Fetch updated list of questions after deletion
-              this.fetchQuestions();
-            } else {
-              console.error('Failed to delete question:', response.statusText);
-            }
-          })
-          .catch(error => {
-            console.error('Error deleting question:', error);
-          });
+      async fetchQuestionsByUserId(userId) {
+  const accessToken = this.getAccessToken();
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ access_token: accessToken })
+  };
+
+  try {
+    const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, requestOptions);
+
+    if (response.ok) {
+      const data = await response.json();
+      this.questions = data;
+    } else {
+      console.error('Failed to fetch questions:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+  }
+},
+
+async deleteAnswers(questionId) {
+  try {
+    const accessToken = this.getAccessToken();
+
+    const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/${questionId}/answers`);
+    const data = await response.json();
+
+    if (data.length === 0) {
+      return;
+    }
+
+    // Iterate over answers and delete each one
+    const promises = data.map(async (answer) => {
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ access_token: accessToken })
+      };
+
+      await fetch(`https://node79.webte.fei.stuba.sk/final/api/answer/delete/${answer.id}`, requestOptions);
+    });
+
+    await Promise.all(promises);
+  } catch (error) {
+    console.error('Error deleting answers:', error);
+  }
+},
+
+
+      async deleteQuestion(question) {
+  try {
+    const accessToken = this.getAccessToken();
+    const questionId = question.question_id;
+
+      await this.deleteAnswers(questionId);
+
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ access_token: accessToken })
+      };
+
+      const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/delete/${questionId}`, requestOptions);
+
+      if (response.ok) {
+        // Remove the question from the local array
+        const index = this.questions.findIndex(q => q.question_id === questionId);
+        if (index !== -1) {
+          this.questions.splice(index, 1);
         }
-      },
+        // Fetch updated list of questions after deletion
+        this.fetchQuestionsByUserId(localStorage.getItem('userId'));
+      } else {
+        console.error('Failed to delete question:', response.statusText);
+      }
+  } catch (error) {
+    console.error('Error deleting question:', error);
+  }
+},
+
       copyQuestion(question) {
         const questionText = question.question;
         navigator.clipboard.writeText(questionText)
@@ -187,6 +202,10 @@
           subject: ''
         };
       },
+      getAccessToken() {
+    const cookieValue = document.cookie;
+    return cookieValue.split('=')[1];
+  },
       submitEditedQuestion() {
         // Implement logic to submit the edited question to your backend
         // You can access the edited question details from this.editedQuestion object
@@ -198,7 +217,7 @@
           subject: ''
         };
         // Fetch updated list of questions after editing
-        this.fetchQuestions();
+        this.fetchQuestionsByUserId(localStorage.getItem('userId'));
       }
     }
   };
