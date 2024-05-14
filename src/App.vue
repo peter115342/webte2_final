@@ -10,7 +10,7 @@
           <v-card>
             <v-card-text>
               <!-- Login component emits accessToken -->
-              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" />
+              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId" />
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -71,7 +71,6 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import axios from 'axios'; // Import axios for making HTTP requests
 import Login from './components/Login.vue';
 
 const { locale } = useI18n();
@@ -89,12 +88,13 @@ const confirmNewPassword = ref('');
 const changePassword = () => {
   // Implement password change logic here
 };
-
+const saveUserId = (id) => {
+  localStorage.setItem('userId', id);
+}
 // Handle successful login
 const handleLoginSuccess = () => {
-  showLoginForm.value = false;
+  showLoginForm.value = false; 
   handleAccessToken(cookieValue.value.split('=')[1]);
-  getUsersAndSaveUserId(getUsernameFromLocalStorage());
   window.location.reload();
 };
 const saveUsername = (username) => {
@@ -118,10 +118,6 @@ const handleRegisterSuccess = () => {
 const handleAccessToken = (accessToken) => {
   if (isValidAccessToken(accessToken)) {
     document.cookie = `access_token=${accessToken}; path=/;`;
-    const username = getUsernameFromLocalStorage();
-    if (username) {
-      getUsersAndSaveUserId(username);
-    }
   }
 };
 
@@ -178,20 +174,7 @@ const hasAccessToken = computed(() => {
   return isValidAccessToken(cookieValue.value.split('=')[1]);
 });
 
-// Function to get all users and save the ID corresponding to the username in local storage
-const getUsersAndSaveUserId = (username) => {
-  axios.get('https://node79.webte.fei.stuba.sk/final/api/user')
-    .then(response => {
-      const users = response.data;
-      const user = users.find(user => user.username === username);
-      if (user) {
-        localStorage.setItem('userId', user.id);
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching users:', error);
-    });
-};
+
 </script>
 
 

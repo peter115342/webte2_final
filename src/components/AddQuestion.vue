@@ -82,7 +82,9 @@ export default {
   },
   methods: {
     async submitQuestion() {
+      const accessToken = this.getAccessToken();
       let payload = {
+        access_token: accessToken,
         subject: this.subject,
         question: this.question,
         type: this.selectedType === 'Multiple Choice' ? 'multiple_choice' : 'open_ended',
@@ -123,13 +125,15 @@ export default {
       }
     },
     async getQuestionsByUserId(userId) {
-      try {
-        const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+      const accessToken = this.getAccessToken();
+  try {
+    const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ access_token: accessToken })
+    });
 
         if (response.ok) {
           const questions = await response.json();
@@ -146,6 +150,7 @@ export default {
       }
     },
     async createAnswer(questionId, answerText, correct) {
+      const accessToken = this.getAccessToken();
       try {
         const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/answer', {
           method: 'POST',
@@ -153,6 +158,7 @@ export default {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            access_token: accessToken,
             correct: correct,
             question_id: questionId,
             answer: answerText
@@ -166,6 +172,10 @@ export default {
         console.error('Error adding answer:', error);
       }
     },
+    getAccessToken() {
+    const cookieValue = document.cookie;
+    return cookieValue.split('=')[1];
+  },
     resetForm() {
       this.subject = '';
       this.question = '';

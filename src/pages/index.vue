@@ -1,11 +1,12 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <AddQuestion />
+  <EditCopyDelete />
 </template>
 
 <script setup>
 import AddQuestion from '@/components/AddQuestion.vue';
-import HomePage from '@/components/HomePage.vue';
+import EditCopyDelete from '@/components/EditCopyDelete.vue';
+
 
 
 
