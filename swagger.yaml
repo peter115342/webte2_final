@@ -142,6 +142,32 @@ paths:
                 $ref: '#/components/schemas/GetAnswers'
         '400':
           description: Error
+  /question/user/{userId}/export:
+    get:
+      tags:
+        - question
+      summary: Export all user questions and answers
+      operationId: exportAllQuestionsAndAnswers
+      parameters:
+        - name: userId
+          in: path
+          description: Export this UserId's questions
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportAllQuestionsByUserId'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ExportAllQuestionsByUserId'
+        '400':
+          description: Error
   /question/user/{userId}:
     post:
       tags:
@@ -199,7 +225,7 @@ paths:
                     type: string    # Added code property
         '400':
           description: Error
-  /question/delete/{questionId}:  
+  /question/delete/{questionId}:
     post:
       tags:
         - question
@@ -462,7 +488,7 @@ paths:
           description: OK
         '400':
           description: Error
-  
+
 components:
   schemas:
     AccessToken:
@@ -488,6 +514,39 @@ components:
           type: string
       xml:
         name: user
+
+    ExportAllQuestionsByUserId:
+      type: object
+      properties:
+        questions:
+          type: object
+          properties:
+            id:
+              type: integer
+            date:
+              type: string
+            subject:
+              type: string
+            question:
+              type: string
+            type_id:
+              type: integer
+            code:
+              type: string
+            answers:
+              type: object
+              properties:
+                id:
+                  type: integer
+                answer:
+                  type: string
+                count:
+                  type: string
+                correct:
+                  type: string
+      xml:
+        name: UserQuestions
+
     GetQuestionsByUserId:
       type: object
       properties:
@@ -522,7 +581,7 @@ components:
     GetAnswers:
       type: object
       properties:
-      
+
         id:
           type: integer
         answer:
