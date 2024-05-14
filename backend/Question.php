@@ -63,6 +63,7 @@ class Question
         $stmt->bind_param("i", $question_id);
         $stmt->execute();
         $result = $stmt->get_result();
+        $answers = [];
         while ($row = mysqli_fetch_assoc($result)) {
             $answers[] = $row;
         }
@@ -98,6 +99,22 @@ class Question
         }
     }
 
+    public function getAllQuestionsForExport($user_id)
+    {
+        $query = "SELECT id, date, subject, question, type_id, code FROM questions WHERE user_id = ?";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $questions = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $questions[] = $row;
+        }
+        $stmt->close();
+        return $questions;
+    }
 
     public function getQuestionByCode($code)
     {
