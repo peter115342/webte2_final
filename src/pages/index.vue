@@ -4,7 +4,6 @@
 </template>
 
 <script setup>
-import AddQuestion from '@/components/AddQuestion.vue';
 import EditCopyDelete from '@/components/EditCopyDelete.vue';
 
 

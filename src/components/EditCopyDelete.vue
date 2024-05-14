@@ -23,9 +23,6 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="copySuccess" class="copy-success-message">
-        <p>Question copied to clipboard!</p>
-      </div>
       <v-dialog v-model="showEdit" max-width="500px">
         <v-card>
           <v-card-title>Edit Question</v-card-title>
@@ -172,20 +169,42 @@ async deleteAnswers(questionId) {
   }
 },
 
-      copyQuestion(question) {
-        const questionText = question.question;
-        navigator.clipboard.writeText(questionText)
-          .then(() => {
-            this.copySuccess = true;
-            setTimeout(() => {
-              this.copySuccess = false;
-            }, 3000); // Hide the success message after 3 seconds
-          })
-          .catch(error => {
-            console.error('Error copying question:', error);
-            alert('Failed to copy question. Please try again.');
-          });
-      },
+async copyQuestion(question) {
+    try {
+        const accessToken = this.getAccessToken();
+
+        // Make a POST request to create a new question
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                access_token: accessToken,
+                subject: question.subject,
+                question: question.question,
+                type: question.type,
+                user_id: question.user_id // Adjust this as per your requirement
+            })
+        };
+
+        const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/question', requestOptions);
+        const data = await response.json();
+
+        if (response.ok) {
+            // Add the new question to the local questions array
+            this.questions.push(data);
+
+            // Fetch updated list of questions after adding new question
+            this.fetchQuestionsByUserId(localStorage.getItem('userId'));
+        } else {
+            console.error('Failed to copy question:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error copying question:', error);
+    }
+},
+
       showEditForm(question) {
         this.showEdit = true;
         // Pre-fill the edit form with existing question details
