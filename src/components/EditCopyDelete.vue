@@ -176,48 +176,88 @@ export default {
     },
 
     async copyQuestion(question) {
-      try {
-        const accessToken = this.getAccessToken();
+  try {
+    const accessToken = this.getAccessToken();
 
-        let questionType;
-        if (question.type_id === 1) {
-          questionType = 'open_ended';
-        } else if (question.type_id === 2) {
-          questionType = 'multiple_choice';
-        } else {
-          throw new Error('Invalid type_id');
-        }
+    let questionType;
+    if (question.type_id === 1) {
+      questionType = 'open_ended';
+    } else if (question.type_id === 2) {
+      questionType = 'multiple_choice';
+    } else {
+      throw new Error('Invalid type_id');
+    }
 
-        // Make a POST request to create a new question
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            access_token: accessToken,
-            subject: question.subject,
-            question: question.question,
-            type: questionType,
-            user_id: question.user_id
-          })
-        };
+    // Make a POST request to create a new question
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        access_token: accessToken,
+        subject: question.subject,
+        question: question.question,
+        type: questionType,
+        user_id: question.user_id
+      })
+    };
 
-        const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/question', requestOptions);
-        const data = await response.json();
+    const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/question', requestOptions);
+    const data = await response.json();
 
-        if (response.ok) {
-          this.questions.push(data);
+    if (response.ok) {
+      this.questions.push(data);
 
-          // Fetch updated list of questions after adding new question
-          this.fetchQuestionsByUserId(localStorage.getItem('userId'));
-        } else {
-          console.error('Failed to copy question:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error copying question:', error);
+      // Fetch updated list of questions after adding new question
+      this.fetchQuestionsByUserId(localStorage.getItem('userId'));
+
+      // Fetch the question with the highest ID for the current user
+      const lastQuestionRequestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          access_token: accessToken
+        })
+      };
+
+      const lastQuestionResponse = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${question.user_id}`, lastQuestionRequestOptions);
+      const lastQuestionData = await lastQuestionResponse.json();
+      
+      // Find the question with the highest ID
+      const lastQuestion = lastQuestionData.reduce((maxQuestion, currentQuestion) => {
+        return currentQuestion.question_id > maxQuestion.question_id ? currentQuestion : maxQuestion;
+      }, { question_id: -Infinity });
+      // Add an answer to the last question
+      const addAnswerRequestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          correct: 0, // You can adjust this based on your requirements
+          answer: 'Your answer here', // Replace with the actual answer
+          question_id: lastQuestion.question_id
+        })
+      };
+
+      const addAnswerResponse = await fetch('https://node79.webte.fei.stuba.sk/final/api/answer', addAnswerRequestOptions);
+      const addAnswerData = await addAnswerResponse.json();
+
+      if (!addAnswerResponse.ok) {
+        console.error('Failed to add answer:', addAnswerResponse.statusText);
       }
-    },
+    } else {
+      console.error('Failed to copy question:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error copying question:', error);
+  }
+},
+
+
 
     showEditForm(question) {
       this.showEdit = true;
