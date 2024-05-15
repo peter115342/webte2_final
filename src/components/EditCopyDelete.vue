@@ -174,7 +174,6 @@ export default {
         console.error('Error deleting question:', error);
       }
     },
-
     async copyQuestion(question) {
   try {
     const accessToken = this.getAccessToken();
@@ -230,25 +229,34 @@ export default {
       const lastQuestion = lastQuestionData.reduce((maxQuestion, currentQuestion) => {
         return currentQuestion.question_id > maxQuestion.question_id ? currentQuestion : maxQuestion;
       }, { question_id: -Infinity });
-      // Add an answer to the last question
-      const addAnswerRequestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          correct: 0, // You can adjust this based on your requirements
-          answer: 'Your answer here', // Replace with the actual answer
-          question_id: lastQuestion.question_id
-        })
-      };
 
-      const addAnswerResponse = await fetch('https://node79.webte.fei.stuba.sk/final/api/answer', addAnswerRequestOptions);
-      const addAnswerData = await addAnswerResponse.json();
+      // Fetch answers for the original question
+      const originalQuestionAnswersResponse = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/${question.question_id}/answers`);
+      const originalQuestionAnswersData = await originalQuestionAnswersResponse.json();
 
-      if (!addAnswerResponse.ok) {
-        console.error('Failed to add answer:', addAnswerResponse.statusText);
+      // Add all answers from the original question to the new question
+      for (const originalAnswer of originalQuestionAnswersData) {
+        const addAnswerRequestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            correct: originalAnswer.correct,
+            answer: originalAnswer.answer,
+            question_id: lastQuestion.question_id
+          })
+        };
+
+        const addAnswerResponse = await fetch('https://node79.webte.fei.stuba.sk/final/api/answer', addAnswerRequestOptions);
+        const addAnswerData = await addAnswerResponse.json();
+
+        if (!addAnswerResponse.ok) {
+          console.error('Failed to add answer:', addAnswerResponse.statusText);
+        }
       }
+
+      console.log('Answers for the original question:', originalQuestionAnswersData);
     } else {
       console.error('Failed to copy question:', response.statusText);
     }
@@ -256,8 +264,6 @@ export default {
     console.error('Error copying question:', error);
   }
 },
-
-
 
     showEditForm(question) {
       this.showEdit = true;
