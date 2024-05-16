@@ -177,7 +177,7 @@ switch ($method) {
          // CHECK ACCESS TOKEN
          elseif ($endpoint === "/user/access") {
             $data = json_decode(file_get_contents("php://input"), true);
-            $result = $userObject->checkAcessToken($data);
+            $result = $userObject->checkAcessToken($data['access_token']);
             if($result){
                 echo json_encode($result);
                 http_response_code(200);
