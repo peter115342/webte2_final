@@ -1,10 +1,10 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <EditCopyDelete />
+  <HomePage />
 </template>
 
 <script setup>
-import EditCopyDelete from '@/components/EditCopyDelete.vue';
+import HomePage from '@/components/HomePage.vue';
 
 
 

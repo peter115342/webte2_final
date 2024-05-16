@@ -46,7 +46,8 @@ export default {
   },
   methods: {
     fetchQuestions() {
-  const code = "VlCPs"; //"code" otázky
+    const code = this.$route.params.code;
+
 
   axios.get(`https://node79.webte.fei.stuba.sk/final/api/${code}`)
     .then(response => {
