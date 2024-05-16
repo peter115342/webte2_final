@@ -10,7 +10,7 @@
           <v-card>
             <v-card-text>
               <!-- Login component emits accessToken -->
-              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId" />
+              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId"  @admin="saveAdmin"/>
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -100,6 +100,9 @@ const handleLoginSuccess = () => {
 const saveUsername = (username) => {
   localStorage.setItem('username', username);
 };
+const saveAdmin= (admin) => {
+  localStorage.setItem('admin', admin);
+}
 const getUsernameFromLocalStorage = () => {
   return localStorage.getItem('username');
 };
@@ -157,6 +160,7 @@ const logout = () => {
   document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   localStorage.removeItem('username');
   localStorage.removeItem('userId');
+  localStorage.removeItem('admin');
   window.location.reload();
 };
 
