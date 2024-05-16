@@ -43,7 +43,6 @@ class User
         LEFT JOIN types ON answers.type_id = types.id";
         */
         $accessToken = $data['access_token'];
-        echo $accessToken;
         $accessTokenData = $this->checkAcessToken($accessToken);
         if (!$accessTokenData) {
             return false;
@@ -144,13 +143,37 @@ class User
         $accessToken = $data['access_token'];
         $username = $data['username'];
         $password = $data['password'];
-
         $accessTokenData = $this->checkAcessToken($accessToken);
-        if (!$accessTokenData || $this->checkUsername($data)) {
+        if (!$accessTokenData) {
             return false;
-        }
+        }        
         $role = $accessTokenData['role'];
         if (($role === "admin") || (($role === "user") && ($id == $accessTokenData['id']))) {
+            if($this->checkUsername($data)){
+                $query = "SELECT id FROM users WHERE username = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $user = $result->fetch_assoc();
+                $stmt->close();
+                $userId = $user['id'];
+                if($userId != $id){
+                    return false;
+                } else {
+                    $query = "SELECT password FROM users WHERE id = ?";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bind_param("i", $id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $user = $result->fetch_assoc();
+                    $stmt->close();
+                    $userPassword = $user['password'];
+                    if(password_verify($password, $userPassword)){
+                        return false;
+                    }
+                }
+            }
             $hashed_password = password_hash($password, PASSWORD_ARGON2ID);
             $stmt = $this->conn->prepare("UPDATE users SET username = ?, password = ? WHERE id = ?");
             $stmt->bind_param("ssi", $username, $hashed_password, $id);
