@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app color="primary">
-      <v-toolbar-title class="title">{{ $t('appTitle') }}</v-toolbar-title>
+      <v-toolbar-title class="title" @click="$router.push({ name: 'Homepage' })">{{ $t('appTitle') }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <template v-if="!hasAccessToken">
         <v-btn @click="showLoginForm = true" class="login-button elevation-2">{{ $t('login') }}</v-btn>
@@ -39,8 +39,8 @@
       <v-navigation-drawer location="right" permanent>
   <v-divider></v-divider>
   <v-list dense nav>
-    <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" value="addQuestion"></v-list-item>
-    <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" value="edit"></v-list-item>
+    <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" @click="$router.push({ name: 'AddQuestion' })" ></v-list-item>
+    <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" @click="$router.push({ name: 'EditCopyDelete' })" ></v-list-item>
     <v-list-item prepend-icon="mdi-lock" :title="$t('changePassword')" value="changePassword" @click="showChangePasswordForm = true"></v-list-item>
   </v-list>
 </v-navigation-drawer>
