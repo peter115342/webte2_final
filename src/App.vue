@@ -10,7 +10,7 @@
           <v-card>
             <v-card-text>
               <!-- Login component emits accessToken -->
-              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId" />
+              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId"  @admin="saveAdmin"/>
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -51,13 +51,13 @@
     <v-card-text>
       <!-- Form to change password -->
       <v-form @submit.prevent="changePassword">
+        <v-text-field v-model="oldPassword" :label="$t('oldPassword')" type="password"></v-text-field>
         <v-text-field v-model="newPassword" :label="$t('newPassword')" type="password"></v-text-field>
         <v-text-field v-model="confirmNewPassword" :label="$t('confirmNewPassword')" type="password"></v-text-field>
         <v-btn type="submit" color="primary">{{ $t('changePassword') }}</v-btn>
       </v-form>
     </v-card-text>
   </v-card>
-   <v-alert v-if="newPassword !== confirmNewPassword" type="error">{{ $t('Hesla sa nezhoduju') }}</v-alert>
 </v-dialog>
 
     </template>
@@ -69,7 +69,6 @@
 </template>
 
 <script setup>
-import axios from 'axios';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Login from './components/Login.vue';
@@ -84,48 +83,11 @@ const showChangePasswordForm = ref(false);
 const oldPassword = ref('');
 const newPassword = ref('');
 const confirmNewPassword = ref('');
+
 // Function to handle password change
-// Function to handle password change
-const changePassword = async () => {
-  try {
-    const userId = localStorage.getItem('userId');
-    const accessToken = cookieValue.value.split('=')[1];
-    const url = `https://node79.webte.fei.stuba.sk/final/api/user/${userId}`;
-
-    // Check if new password and confirm password match
-    if (newPassword.value !== confirmNewPassword.value) {
-      console.error('New password and confirm password do not match');
-      // Display an error message to the user
-      alert('New password and confirm password do not match');
-      return; // Exit the function if passwords do not match
-    }
-
-    console.log('New password:', newPassword.value); // Log the new password before making the API call
-
-    console.log('usernamee',localStorage.getItem("username")); 
-    
-    console.log('administrator',localStorage.getItem("administrator")); 
-    const response = await axios.put(url, {
-      username: localStorage.getItem("username"),
-      access_token: accessToken,
-      password: newPassword.value,
-      administrator: localStorage.getItem("administrator")
-    });
-
-    console.log('API response:', response); // Log the API response
-
-    if (response.status === 200) {
-      console.log('Password changed successfully');
-    } else {
-      console.error('Failed to change password');
-    }
-  } catch (error) {
-    console.error('An error occurred while changing password:', error);
-  }
+const changePassword = () => {
+  // Implement password change logic here
 };
-
-
-
 const saveUserId = (id) => {
   localStorage.setItem('userId', id);
 }
@@ -138,6 +100,9 @@ const handleLoginSuccess = () => {
 const saveUsername = (username) => {
   localStorage.setItem('username', username);
 };
+const saveAdmin= (admin) => {
+  localStorage.setItem('admin', admin);
+}
 const getUsernameFromLocalStorage = () => {
   return localStorage.getItem('username');
 };
@@ -195,7 +160,7 @@ const logout = () => {
   document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   localStorage.removeItem('username');
   localStorage.removeItem('userId');
-  localStorage.removeItem('administrator');
+  localStorage.removeItem('admin');
   window.location.reload();
 };
 

@@ -94,6 +94,7 @@ const login = async () => {
       emit('accessToken', response.data.access_token);
       emit('username', username.value);
       emit('id', response.data.id);
+      emit('admin', response.data.administrator);
       emit('loginSuccess');
     } else {
       console.error('Login failed. Please check your credentials.');
