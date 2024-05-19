@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once "User.php";
 require_once "Question.php";
 require_once "config.php";
+require_once "getPDF.php";
 error_reporting(E_ALL);    // TODO: Odstranit
 ini_set('display_errors', 1);
 $userObject = new User($conn);
@@ -27,7 +28,7 @@ switch ($method) {
             $question = $questionObject->getQuestionByCode($code);
             http_response_code(200);
             echo json_encode($question);
-        }        
+        }
         // GET ALL ANSWERS TO QUESTION
         elseif (preg_match("/^\/question\/(\d+)\/answers$/", $endpoint, $matches)) {
             $question_id = $matches[1];
@@ -39,6 +40,9 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
+        }
+        elseif ($endpoint ===  "/pdf") {
+            generatePDF();
         }
         //EXPORT ALL USER QUESTIONS AND ANSWERS TO JSON FILE
         elseif (preg_match("/^\/question\/user\/(\d+)\/export$/", $endpoint, $matches)) {
@@ -117,7 +121,7 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 exit();
             }
-            $user = $userObject->login($data);           
+            $user = $userObject->login($data);
             if($user){
                 echo json_encode($user);
                 http_response_code(200);
@@ -185,8 +189,8 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        }  
-        
+        }
+
          // LOGOUT
          elseif ($endpoint === "/user/logout") {
             $data = json_decode(file_get_contents("php://input"), true);
@@ -236,12 +240,12 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        }   
+        }
         else {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
         }
-        
+
         break;
     case 'PUT':
         // UPDATE ANSWER
@@ -287,7 +291,7 @@ switch ($method) {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
         }
-        break;  
+        break;
     default:
         http_response_code(405);
         echo json_encode(["message" => "Method not allowed"]);
