@@ -51,13 +51,13 @@
     <v-card-text>
       <!-- Form to change password -->
       <v-form @submit.prevent="changePassword">
-        <v-text-field v-model="oldPassword" :label="$t('oldPassword')" type="password"></v-text-field>
         <v-text-field v-model="newPassword" :label="$t('newPassword')" type="password"></v-text-field>
         <v-text-field v-model="confirmNewPassword" :label="$t('confirmNewPassword')" type="password"></v-text-field>
         <v-btn type="submit" color="primary">{{ $t('changePassword') }}</v-btn>
       </v-form>
     </v-card-text>
   </v-card>
+  <v-alert v-if="newPassword !== confirmNewPassword" type="error">{{ $t('Hesla sa nezhoduju') }}</v-alert>
 </v-dialog>
 
     </template>
@@ -81,12 +81,38 @@ const showUserModal = ref(false);
 const cookieValue = ref(document.cookie);
 const showChangePasswordForm = ref(false);
 const oldPassword = ref('');
+import axios from 'axios';
 const newPassword = ref('');
 const confirmNewPassword = ref('');
 
 // Function to handle password change
-const changePassword = () => {
-  // Implement password change logic here
+const changePassword = async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    const accessToken = cookieValue.value.split('=')[1];
+    const url = `https://node79.webte.fei.stuba.sk/final/api/user/${userId}`;
+    // Check if new password and confirm password match
+    if (newPassword.value !== confirmNewPassword.value) {
+      console.error('New password and confirm password do not match');
+      // Display an error message to the user
+      alert('New password and confirm password do not match');
+      return; // Exit the function if passwords do not match
+    }
+    const response = await axios.put(url, {
+      username: localStorage.getItem("username"),
+      access_token: accessToken,
+      password: newPassword.value,
+      administrator: localStorage.getItem("administrator")
+    });
+    console.log('API response:', response); // Log the API response
+    if (response.status === 200) {
+      console.log('Password changed successfully');
+    } else {
+      console.error('Failed to change password');
+    }
+  } catch (error) {
+    console.error('An error occurred while changing password:', error);
+  }
 };
 const saveUserId = (id) => {
   localStorage.setItem('userId', id);
