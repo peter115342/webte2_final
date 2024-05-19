@@ -1,10 +1,9 @@
 <?php
 require_once('TCPDF/tcpdf.php');
 
-$url = 'https://node22.webte.fei.stuba.sk/Manual/index.php';
 function generatePDF()
 {
-    $url = 'https://node22.webte.fei.stuba.sk/Manual/index.php';
+    $url = 'https://sk.wikipedia.org/wiki/Text';
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
