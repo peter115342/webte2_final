@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once "User.php";
 require_once "Question.php";
 require_once "config.php";
+require_once "getPDF.php";
 error_reporting(E_ALL);    // TODO: Odstranit
 ini_set('display_errors', 1);
 $userObject = new User($conn);
@@ -39,6 +40,9 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
+        }
+        elseif ($endpoint === "/pdf"){
+            generatePDF();
         }
         //EXPORT ALL USER QUESTIONS AND ANSWERS TO JSON FILE
         elseif (preg_match("/^\/question\/user\/(\d+)\/export$/", $endpoint, $matches)) {
