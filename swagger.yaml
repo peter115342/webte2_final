@@ -3,6 +3,15 @@ info:
   title: Hlasovací systém
   version: 1.0.11
 paths:
+ /pdf:
+    get:
+      tags:
+        - pdf
+      summary: Creates a pdf from manual page
+      description: Creates a pdf from manual page
+      responses:
+        '200':
+          description: OK
   /answer:
     post:
       tags:
@@ -27,7 +36,7 @@ paths:
           description: OK
         '400':
           description: Error
-  
+
   /answer/delete/{answerId}:
     post:
       tags:

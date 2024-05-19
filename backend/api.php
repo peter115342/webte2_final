@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once "User.php";
 require_once "Question.php";
 require_once "config.php";
+require_once "getPDF.php";
 error_reporting(E_ALL);    // TODO: Odstranit
 ini_set('display_errors', 1);
 $userObject = new User($conn);
@@ -27,7 +28,7 @@ switch ($method) {
             $question = $questionObject->getQuestionByCode($code);
             http_response_code(200);
             echo json_encode($question);
-        }        
+        }
         // GET ALL ANSWERS TO QUESTION
         elseif (preg_match("/^\/question\/(\d+)\/answers$/", $endpoint, $matches)) {
             $question_id = $matches[1];
@@ -40,6 +41,13 @@ switch ($method) {
                 http_response_code(400);
             }
         }
+
+        //GENERATE PDF
+        elseif (preg_match("/^\/pdf(?:\/.*)?$/", $endpoint)) {
+            header('Content-Type: application/pdf');
+            generatePDF();
+        }
+
         //EXPORT ALL USER QUESTIONS AND ANSWERS TO JSON FILE
         elseif (preg_match("/^\/question\/user\/(\d+)\/export$/", $endpoint, $matches)) {
             $id = $matches[1];
@@ -97,7 +105,7 @@ switch ($method) {
                 http_response_code(400);
             }
         }
-         // GET ALL USERS
+        // GET ALL USERS
         elseif ($endpoint ===  "/user/list") {
             $data = json_decode(file_get_contents("php://input"), true);
             $users = $userObject->getAllUsers($data);
@@ -109,7 +117,7 @@ switch ($method) {
                 http_response_code(400);
             }
         }
-         // LOGIN USER
+        // LOGIN USER
         elseif ($endpoint ===  "/user/login") {
             $data = json_decode(file_get_contents("php://input"), true);
             if (empty($data)) {
@@ -117,7 +125,7 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 exit();
             }
-            $user = $userObject->login($data);           
+            $user = $userObject->login($data);
             if($user){
                 echo json_encode($user);
                 http_response_code(200);
@@ -174,8 +182,8 @@ switch ($method) {
                 http_response_code(400);
             }
         }
-         // CHECK ACCESS TOKEN
-         elseif ($endpoint === "/user/access") {
+        // CHECK ACCESS TOKEN
+        elseif ($endpoint === "/user/access") {
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $userObject->checkAcessToken($data['access_token']);
             if($result){
@@ -185,10 +193,10 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        }  
-        
-         // LOGOUT
-         elseif ($endpoint === "/user/logout") {
+        }
+
+        // LOGOUT
+        elseif ($endpoint === "/user/logout") {
             $data = json_decode(file_get_contents("php://input"), true);
             $result = $userObject->logout($data);
             if($result){
@@ -236,12 +244,12 @@ switch ($method) {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);
             }
-        }   
+        }
         else {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
         }
-        
+
         break;
     case 'PUT':
         // UPDATE ANSWER
@@ -287,7 +295,7 @@ switch ($method) {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);
         }
-        break;  
+        break;
     default:
         http_response_code(405);
         echo json_encode(["message" => "Method not allowed"]);
