@@ -41,6 +41,7 @@ switch ($method) {
                 http_response_code(400);
             }
         }
+
         //GENERATE PDF
         elseif (preg_match("/^\/pdf(?:\/.*)?$/", $endpoint)) {
             header('Content-Type: application/pdf');
