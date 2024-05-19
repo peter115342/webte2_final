@@ -25,8 +25,8 @@ import { useRouter } from 'vue-router';
   const code = ref('');
 
   const submitCode = () => {
-    //TODO - Add logic to check if code is valid and navigate to question page
-    router.push('/question');
+    // Odoslanie kódu cez router
+    router.push({ name: 'Question', params: { code: code.value }});
   };
 </script>
 
@@ -37,6 +37,5 @@ import { useRouter } from 'vue-router';
   
   .logo-container {
     margin-bottom: 50px;
-
   }
 </style>

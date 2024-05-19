@@ -22,6 +22,8 @@
     "password": "Password",
     "newUsername": "New username",
     "confirmPassword": "Confirm password",
-    "enterCode": "Enter code"
+    "enterCode": "Enter code",
+    "Hesla sa nezhoduju": "Passwords do not match"
+
   }
   

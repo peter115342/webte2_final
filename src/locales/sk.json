@@ -22,6 +22,7 @@
     "password": "Heslo",
     "newUsername": "Nové uživateľské meno",
     "confirmPassword": "Potvrdiť heslo",
-    "enterCode": "Vložiť kód"
+    "enterCode": "Vložiť kód",
+    "Hesla sa nezhoduju": "Heslá sa nezhodujú"
   }
   
