@@ -1,36 +1,25 @@
 <?php
-require_once('TCPDF/tcpdf.php');
+
+
 
 function generatePDF()
 {
     $url = 'https://node22.webte.fei.stuba.sk/Manual/index.php';
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-curl_close($ch);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);
 
-if ($response === false) {
-    die('Error');
-}
     if ($response === false) {
-        die('Error');
+        http_response_code(500);
+        echo json_encode(['message' => 'Error fetching the URL']);
+        exit();
     }
 
-$pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetTitle('PDF Manual');
-$pdf->SetHeaderData('', 0, 'PDF Manual', '');
-$pdf->setPrintHeader(false);
-$pdf->setPrintFooter(false);
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-$pdf->AddPage();
+    require_once('TCPDF/tcpdf.php');
+
     $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
     $pdf->SetCreator(PDF_CREATOR);
     $pdf->SetTitle('PDF Manual');
@@ -40,75 +29,36 @@ $pdf->AddPage();
     $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
     $pdf->AddPage();
 
+    libxml_use_internal_errors(true);
 
-$dom = new DOMDocument();
-$dom->loadHTML($response);
     $dom = new DOMDocument();
     $dom->loadHTML($response);
 
-$title = $dom->getElementsByTagName('h1')->item(0);
-$pdf->SetFont('freeserif', 'B', 14);
-$pdf->writeHTML($title->textContent, true, false, true);
-$pdf->writeHTML('<br>', true, false, true);
+    libxml_clear_errors();
+
+    function writeHtmlToPdf($pdf, $element, $font, $size, $style = '') {
+        if ($element) {
+            $pdf->SetFont($font, $style, $size);
+            $pdf->writeHTML($element->textContent, true, false, true);
+            $pdf->writeHTML('<br>', true, false, true);
+        }
+    }
+
     $title = $dom->getElementsByTagName('h1')->item(0);
-    $pdf->SetFont('freeserif', 'B', 14);
-    $pdf->writeHTML($title->textContent, true, false, true);
-    $pdf->writeHTML('<br>', true, false, true);
+    writeHtmlToPdf($pdf, $title, 'freeserif', 14, 'B');
 
-$subtitle1 = $dom->getElementsByTagName('h3')->item(0);
-$pdf->SetFont('freeserif', 'B', 12);
-$pdf->writeHTML($subtitle1->textContent, true, false, true);
-$pdf->writeHTML('<br>', true, false, true);
-    $subtitle1 = $dom->getElementsByTagName('h3')->item(0);
-    $pdf->SetFont('freeserif', 'B', 12);
-    $pdf->writeHTML($subtitle1->textContent, true, false, true);
-    $pdf->writeHTML('<br>', true, false, true);
+    $subtitles = $dom->getElementsByTagName('h3');
+    $texts = $dom->getElementsByTagName('p');
 
-$subtitle1_text = $dom->getElementsByTagName('p')->item(0);
-$pdf->SetFont('freeserif', '', 10);
-$pdf->writeHTML($subtitle1_text->textContent, true, false, true);
-$pdf->writeHTML('<br>', true, false, true);
-    $subtitle1_text = $dom->getElementsByTagName('p')->item(0);
-    $pdf->SetFont('freeserif', '', 10);
-    $pdf->writeHTML($subtitle1_text->textContent, true, false, true);
-    $pdf->writeHTML('<br>', true, false, true);
+    for ($i = 0; $i < $subtitles->length; $i++) {
+        $subtitle = $subtitles->item($i);
+        writeHtmlToPdf($pdf, $subtitle, 'freeserif', 12, 'B');
 
-$subtitle2 = $dom->getElementsByTagName('h3')->item(1);
-$pdf->SetFont('freeserif', 'B', 12);
-$pdf->writeHTML($subtitle2->textContent, true, false, true);
-$pdf->writeHTML('<br>', true, false, true);
-    $subtitle2 = $dom->getElementsByTagName('h3')->item(1);
-    $pdf->SetFont('freeserif', 'B', 12);
-    $pdf->writeHTML($subtitle2->textContent, true, false, true);
-    $pdf->writeHTML('<br>', true, false, true);
+        if ($i < $texts->length) {
+            $text = $texts->item($i);
+            writeHtmlToPdf($pdf, $text, 'freeserif', 10);
+        }
+    }
 
-$subtitle2_text = $dom->getElementsByTagName('p')->item(1);
-$pdf->SetFont('freeserif', '', 10);
-$pdf->writeHTML($subtitle2_text->textContent, true, false, true);
-$pdf->writeHTML('<br>', true, false, true);
-    $subtitle2_text = $dom->getElementsByTagName('p')->item(1);
-    $pdf->SetFont('freeserif', '', 10);
-    $pdf->writeHTML($subtitle2_text->textContent, true, false, true);
-    $pdf->writeHTML('<br>', true, false, true);
-
-$subtitle3 = $dom->getElementsByTagName('h3')->item(2);
-$pdf->SetFont('freeserif', 'B', 12);
-$pdf->writeHTML($subtitle3->textContent, true, false, true);
-$pdf->writeHTML('<br>', true, false, true);
-    $subtitle3 = $dom->getElementsByTagName('h3')->item(2);
-    $pdf->SetFont('freeserif', 'B', 12);
-    $pdf->writeHTML($subtitle3->textContent, true, false, true);
-    $pdf->writeHTML('<br>', true, false, true);
-
-$subtitle3_text = $dom->getElementsByTagName('p')->item(2);
-$pdf->SetFont('freeserif', '', 10);
-$pdf->writeHTML($subtitle3_text->textContent, true, false, true);
-$pdf->writeHTML('<br>', true, false, true);
-    $subtitle3_text = $dom->getElementsByTagName('p')->item(2);
-    $pdf->SetFont('freeserif', '', 10);
-    $pdf->writeHTML($subtitle3_text->textContent, true, false, true);
-    $pdf->writeHTML('<br>', true, false, true);
-
-$pdf->Output('file.pdf', 'D');
     $pdf->Output('file.pdf', 'D');
 }
