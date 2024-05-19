@@ -1,10 +1,9 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <EditCopyDelete />
+  <Manual />
 </template>
 
 <script setup>
-import EditCopyDelete from '@/components/EditCopyDelete.vue';
 
 
 
