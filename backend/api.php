@@ -41,9 +41,13 @@ switch ($method) {
                 http_response_code(400);
             }
         }
-        elseif ($endpoint === "/pdf"){
+
+        //GENERATE PDF
+        elseif (preg_match("/^\/pdf(?:\/.*)?$/", $endpoint)) {
+            header('Content-Type: application/pdf');
             generatePDF();
         }
+
         //EXPORT ALL USER QUESTIONS AND ANSWERS TO JSON FILE
         elseif (preg_match("/^\/question\/user\/(\d+)\/export$/", $endpoint, $matches)) {
             $id = $matches[1];

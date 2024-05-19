@@ -1,6 +1,7 @@
 <?php
 
 
+
 function generatePDF()
 {
     $url = 'https://node22.webte.fei.stuba.sk/Manual/index.php';
@@ -61,5 +62,3 @@ function generatePDF()
 
     $pdf->Output('file.pdf', 'D');
 }
-
-
