@@ -8,6 +8,7 @@ import Homepage from '@/components/HomePage.vue'
 import Question from '@/components/Question.vue'
 import Manual from '../components/Manual.vue';
 import Results from '../components/Results.vue';
+import Users from '../components/Users.vue';
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes: [
@@ -46,6 +47,11 @@ const router = createRouter({
       name: 'Results',
       component: Results,
       props: true
+    },
+    {
+      path: '/',
+      name: 'Users',
+      component: Users,
     },
   ]
 })

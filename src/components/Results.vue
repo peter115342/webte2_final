@@ -27,6 +27,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
+              <p class="caption">{{ $t('caption') }}</p>
             </div>
             
           </v-card-text>
@@ -95,5 +96,9 @@ export default {
 
 .word-cloud span {
   margin-right: 20px;
+/* Add your custom styles here */
+.caption {
+  font-size: 12px;
+  color: gray;
 }
 </style>

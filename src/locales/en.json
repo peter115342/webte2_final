@@ -29,7 +29,8 @@
     "count": "Count",
     "show_answers" : "List items",
     "show_word_cloud" : "Word cloud"
-
-
+    "selectUser" : "Select user by ID",
+    "userList" : "Users",
+    "caption": "Click on 'PresentFlow' in the app bar to get to the home."
   }
   
