@@ -54,8 +54,6 @@ export default {
         subject: '',
         type_id: null
       },
-      allUserIds: [],
-      allUserQuestions: [],
       headers: [
         { text: 'Question ID', value: 'question_id' },
         { text: 'Question', value: 'question' },
@@ -63,7 +61,9 @@ export default {
         { text: 'Delete', value: 'actions', sortable: false },
         { text: 'Copy', value: 'actions', sortable: false },
         { text: 'Edit', value: 'actions', sortable: false }
-      ]
+      ],
+      allUserIds: [], // New array to store all user IDs
+      allUserQuestions: [], // New array to store questions of all users
     };
   },
   computed: {
@@ -441,7 +441,7 @@ button i {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 999;
 }
-  .red--text {
+.red--text {
     color: red;
   }
 </style>
