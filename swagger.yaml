@@ -160,6 +160,24 @@ paths:
                 $ref: '#/components/schemas/GetAnswers'
         '400':
           description: Error
+  /question/export:
+    get:
+      tags:
+        - question
+      summary: Export all questions and answers
+      operationId: exportAllQuestionsAndAnswers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportAllQuestionsForAdmin'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ExportAllQuestionsForAdmin'
+        '400':
+          description: Error
   /question/user/{userId}/export:
     get:
       tags:
@@ -532,6 +550,40 @@ components:
           type: string
       xml:
         name: user
+
+    ExportAllQuestionsForAdmin:
+      type: object
+      properties:
+        questions:
+          type: object
+          properties:
+            id:
+              type: integer
+            user_id:
+              type: integer
+            date:
+              type: string
+            subject:
+              type: string
+            question:
+              type: string
+            type_id:
+              type: integer
+            code:
+              type: string
+            answers:
+              type: object
+              properties:
+                id:
+                  type: integer
+                answer:
+                  type: string
+                count:
+                  type: string
+                correct:
+                  type: string
+      xml:
+        name: UserQuestions
 
     ExportAllQuestionsByUserId:
       type: object
