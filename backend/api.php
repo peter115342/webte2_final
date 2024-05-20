@@ -90,8 +90,8 @@ switch ($method) {
             $data = json_decode(file_get_contents("php://input"), true);
             $questions = $questionObject->getQuestionsByUserId($id, $data);
             if($questions){
-                echo json_encode($questions);
                 http_response_code(200);
+                echo json_encode($questions);
             } else {
                 echo json_encode(["message" => "Error"]);
                 http_response_code(400);

@@ -108,28 +108,31 @@ export default {
   },
   methods: {
     async fetchQuestionsByUserId(userId) {
-      const accessToken = this.getAccessToken();
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ access_token: accessToken })
-      };
-
-      try {
-        const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, requestOptions);
-
-        if (response.ok) {
-          const data = await response.json();
-          this.questions = data;
-        } else {
-          console.error('Failed to fetch questions:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
+  const accessToken = this.getAccessToken();
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
     },
+    body: JSON.stringify({ access_token: accessToken })
+  };
+
+  try {
+    const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, requestOptions);
+
+    if (response.ok) {
+      const data = await response.json();
+      this.questions = data;
+    } else {
+      console.error('Failed to fetch questions:', response.statusText);
+      const text = await response.text();
+      console.log('Response Text:', text);
+    }
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+  }
+},
+
 
     async deleteAnswers(questionId) {
       try {
