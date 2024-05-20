@@ -26,7 +26,9 @@
     "Hesla sa nezhoduju": "Passwords do not match",
     "downloadPDF": "Download PDF",
     "answer": "Results", 
-    "count": "Count"
+    "count": "Count",
+    "show_answers" : "List items",
+    "show_word_cloud" : "Word cloud"
 
 
   }

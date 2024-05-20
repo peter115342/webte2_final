@@ -26,7 +26,9 @@
     "Hesla sa nezhoduju": "Heslá sa nezhodujú",
     "downloadPDF": "Stiahnuť PDF",
     "answer": "Výsledky",
-    "count" : "Počet"
+    "count" : "Počet",
+    "show_answers" : "Položky zoznamu",
+    "show_word_cloud" : "Word cloud"
 
   }
   

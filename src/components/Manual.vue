@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import { useI18n } from 'vue-i18n';
 import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 export default {
   setup() {
@@ -20,6 +20,7 @@ export default {
         <p>Tento návod popisuje, ako používať našu aplikáciu.</p>
       </section>
       <section>
+        <li>Návrat na domovsku stránku je možny kliknutím na nápis "PresentFlow" v ľavom hornom rohu.</li>
         <h3>Roly a oprávnenia</h3>
         <ul>
           <li>
@@ -56,6 +57,7 @@ export default {
         <p>This guide describes how to use our application.</p>
       </section>
       <section>
+        <li>You can return to the home page by clicking on the inscription "Present Flow" in the upper left corner.</li>
         <h3>Roles and Permissions</h3>
         <ul>
           <li>
