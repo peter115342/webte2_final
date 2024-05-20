@@ -6,7 +6,7 @@ import AddQuestion from '@/components/AddQuestion.vue'
 import EditCopyDelete from '@/components/EditCopyDelete.vue'
 import Homepage from '@/components/HomePage.vue'
 import Question from '@/components/Question.vue'
-
+import Manual from '../components/Manual.vue';
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes: [
@@ -33,6 +33,11 @@ const router = createRouter({
       name: 'EditCopyDelete',
       component: EditCopyDelete
     },
+    {
+      path: '/manual',
+      name: 'Manual',
+      component: Manual,
+    }
   ]
 })
 
