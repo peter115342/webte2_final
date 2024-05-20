@@ -1,51 +1,37 @@
 <template>
   <div>
-    <h2>Questions</h2>
-    <table>
-      <thead>
+    <h2 class="mb-4">Questions</h2>
+    <v-data-table
+      :headers="headers"
+      :items="uniqueQuestions"
+      item-key="question_id"
+      class="elevation-1"
+    >
+      <template v-slot:item="{ item }">
         <tr>
-          <th>Question ID</th>
-          <th>Question</th>
-          <th>Subject</th>
-          <th>Delete</th>
-          <th>Copy</th>
-          <th>Edit</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="question in uniqueQuestions" :key="question.question_id">
-          <td>{{ question.question_id }}</td>
-          <td>{{ question.question }}</td>
-          <td>{{ question.subject }}</td>
+          <td>{{ item.question_id }}</td>
+          <td>{{ item.question }}</td>
+          <td>{{ item.subject }}</td>
           <td>
-            <button @click="deleteQuestion(question)"><i class="mdi mdi-delete"></i></button>
+            <v-icon small class="red--text" @click="deleteQuestion(item)">mdi-delete</v-icon>
           </td>
           <td>
-            <button @click="copyQuestion(question)"><i class="mdi mdi-content-copy"></i></button>
+            <v-icon small @click="copyQuestion(item)">mdi-content-copy</v-icon>
           </td>
           <td>
-            <button @click="showEditForm(question)"><i class="mdi mdi-pencil"></i></button>
+            <v-icon small @click="showEditForm(item)">mdi-pencil</v-icon>
           </td>
         </tr>
-      </tbody>
-    </table>
+      </template>
+    </v-data-table>
+
     <v-dialog v-model="showEdit" max-width="500px">
       <v-card>
-        <v-card-title>Edit Question</v-card-title>
+        <v-card-title class="headline">Edit Question</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="submitEditedQuestion">
-            <v-text-field
-              v-model="editedQuestion.question"
-              label="Question"
-              outlined
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="editedQuestion.subject"
-              label="Subject"
-              outlined
-              required
-            ></v-text-field>
+            <v-text-field v-model="editedQuestion.question" label="Question" outlined required></v-text-field>
+            <v-text-field v-model="editedQuestion.subject" label="Subject" outlined required></v-text-field>
             <v-btn type="submit" color="primary">Save</v-btn>
             <v-btn @click="cancelEdit">Cancel</v-btn>
           </v-form>
@@ -68,8 +54,16 @@ export default {
         subject: '',
         type_id: null
       },
-      allUserIds: [], // New array to store all user IDs
-      allUserQuestions: [], // New array to store questions of all users
+      allUserIds: [],
+      allUserQuestions: [],
+      headers: [
+        { text: 'Question ID', value: 'question_id' },
+        { text: 'Question', value: 'question' },
+        { text: 'Subject', value: 'subject' },
+        { text: 'Delete', value: 'actions', sortable: false },
+        { text: 'Copy', value: 'actions', sortable: false },
+        { text: 'Edit', value: 'actions', sortable: false }
+      ]
     };
   },
   computed: {
@@ -447,4 +441,7 @@ button i {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 999;
 }
+  .red--text {
+    color: red;
+  }
 </style>
