@@ -26,7 +26,10 @@
     "Hesla sa nezhoduju": "Passwords do not match",
     "downloadPDF": "Download PDF",
     "answer": "Results", 
-    "count": "Count"
+    "count": "Count",
+    "selectUser" : "Select user by ID",
+    "userList" : "Users",
+    "caption": "Click on 'PresentFlow' in the app bar to get to the home."
 
 
   }

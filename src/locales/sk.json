@@ -26,7 +26,10 @@
     "Hesla sa nezhoduju": "Heslá sa nezhodujú",
     "downloadPDF": "Stiahnuť PDF",
     "answer": "Výsledky",
-    "count" : "Počet"
+    "count" : "Počet",
+    "selectUser" : "Vyber uživateľa podla ID",
+    "userList" : "Uživatelia",
+    "caption": "Kliknite na 'PresentFlow' v hornej lište, aby ste sa dostali domov."
 
   }
   

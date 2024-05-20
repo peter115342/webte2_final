@@ -4,8 +4,8 @@
       <v-toolbar-title class="title clickable" @click="$router.push({ name: 'Homepage' })">{{ $t('appTitle') }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <template v-if="!hasAccessToken">
-        <v-btn @click="showLoginForm = true" class="login-button elevation-2" style="margin-right: 10px">{{ $t('login')}} </v-btn>
-        <v-dialog v-model="showLoginForm" max-width="500">
+        <v-btn @click="showLoginForm = true" class="login-button elevation-2" style="margin-right: 10px">{{ $t('login') }} </v-btn>
+        <v-dialog v-model="showLoginForm" max-width="650">
           <template v-slot:activator="{ on }"></template>
           <v-card>
             <v-card-text>
@@ -46,6 +46,7 @@
           <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" @click="$router.push({ name: 'AddQuestion' })"></v-list-item>
           <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" @click="$router.push({ name: 'EditCopyDelete' })"></v-list-item>
           <v-list-item prepend-icon="mdi-lock" :title="$t('changePassword')" value="changePassword" @click="showChangePasswordForm = true"></v-list-item>
+          <v-list-item v-if="isAdmin" prepend-icon="mdi-account-group" :title="$t('userList')" @click="$router.push({ name: 'Users' })"></v-list-item>
         </v-list>
       </v-navigation-drawer>
       
@@ -60,7 +61,7 @@
             </v-form>
           </v-card-text>
         </v-card>
-        <v-alert v-if="newPassword !== confirmNewPassword" type="error">{{ $t('Hesla sa nezhoduju') }}</v-alert>
+        <v-alert v-if="newPassword !== confirmNewPassword" type="error">{{ $t('passwordMismatch') }}</v-alert>
       </v-dialog>
     </template>
 
@@ -191,6 +192,10 @@ onMounted(() => {
 
 const hasAccessToken = computed(() => {
   return isValidAccessToken(cookieValue.value.split('=')[1]);
+});
+
+const isAdmin = computed(() => {
+  return localStorage.getItem('admin') === '1';
 });
 </script>
 

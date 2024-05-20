@@ -108,6 +108,10 @@ export default {
   },
   methods: {
     async fetchQuestionsByUserId(userId) {
+      if (localStorage.getItem('admin') === '1') {
+      this.getAllUserIds();
+    }
+
   const accessToken = this.getAccessToken();
   const requestOptions = {
     method: 'POST',

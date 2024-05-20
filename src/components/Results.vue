@@ -13,6 +13,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-list>
+            <p class="caption">{{ $t('caption') }}</p>
           </v-card-text>
         </v-card>
       </v-col>
@@ -63,4 +64,8 @@ export default {
 
 <style scoped>
 /* Add your custom styles here */
+.caption {
+  font-size: 12px;
+  color: gray;
+}
 </style>

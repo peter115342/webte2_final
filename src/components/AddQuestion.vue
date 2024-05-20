@@ -9,6 +9,16 @@
           </v-card-title>
           <v-card-text>
             <v-form @submit.prevent="submitQuestion">
+              <!-- Message for admin to select user -->
+              <template v-if="isAdmin">
+                <v-select
+                  v-model="selectedUser"
+                  :items="userOptions"
+                  :label="$t('selectUser')"
+                  outlined
+                  required
+                ></v-select>
+              </template>
               <v-text-field
                 v-model="subject"
                 :label="$t('subject')"
@@ -28,24 +38,25 @@
                 outlined
                 required
               ></v-select>
+              <!-- Option fields for Multiple Choice -->
               <template v-if="selectedType === 'Multiple Choice'">
                 <template v-for="(option, index) in options" :key="index">
                   <v-icon v-if="options.length > 1 && index === options.length - 1" @click="removeOption(index)" color="red" size="24">mdi-minus</v-icon>
                   <v-icon v-if="index === options.length - 1" @click="addOption" color="green" size="24">mdi-plus</v-icon>
-
                   <v-text-field
-                    v-model="options[index].text"
+                    v-model="option.text"
                     :label="$t('option ') + (index + 1)"
                     outlined
                     required
                   ></v-text-field>
                   <v-checkbox
-                    v-model="options[index].correct"
+                    v-model="option.correct"
                     :label="$t('correct ') + (index + 1)"
                     :value="true"
                   ></v-checkbox>
                 </template>
               </template>
+              <!-- Submit and reset buttons -->
               <v-btn-group>
                 <v-btn type="submit" color="primary" small>{{ $t('submit') }}</v-btn>
                 <v-btn @click="resetForm" color="background" small>{{ $t('reset') }}</v-btn>
@@ -55,6 +66,7 @@
         </v-card>
       </v-col>
     </v-row>
+    <!-- Snackbar for notifications -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout" :top="snackbar.top">
       {{ snackbar.text }}
     </v-snackbar>
@@ -68,27 +80,52 @@ export default {
       subject: '',
       question: '',
       selectedType: 'Multiple Choice',
-      options: [
-        { text: '', correct: false }
-      ],
-      snackbar: {
-        show: false,
-        color: '',
-        timeout: 3000,
-        top: false,
-        text: ''
-      }
+      options: [{ text: '', correct: false }],
+      snackbar: { show: false, color: '', timeout: 3000, top: false, text: '' },
+      isAdmin: false,
+      users: [],
+      selectedUser: null,
     };
   },
+  computed: {
+    userOptions() {
+      return this.users.map(user => user.id);
+    }
+  },
+  async mounted() {
+    const isAdmin = localStorage.getItem('admin') === '1';
+    if (isAdmin) {
+      this.isAdmin = true;
+      await this.getAllUsers();
+    }
+  },
   methods: {
+    async getAllUsers() {
+      try {
+        const accessToken = this.getAccessToken();
+        const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/user/list', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: accessToken })
+        });
+
+        if (response.ok) {
+          this.users = await response.json();
+          console.log('Users:', this.users);
+        } else {
+          console.error('Failed to fetch users:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    },
     async submitQuestion() {
-      const accessToken = this.getAccessToken();
       let payload = {
-        access_token: accessToken,
+        access_token: this.getAccessToken(),
         subject: this.subject,
         question: this.question,
         type: this.selectedType === 'Multiple Choice' ? 'multiple_choice' : 'open_ended',
-        user_id: localStorage.getItem('userId')
+        user_id: this.isAdmin ? this.selectedUser : localStorage.getItem('userId')
       };
       
       if (this.selectedType === 'Multiple Choice') {
@@ -98,14 +135,12 @@ export default {
       try {
         const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/question', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
         if (response.ok) {
-          const questionId = await this.getQuestionsByUserId(localStorage.getItem('userId'));
+          const questionId = await this.getQuestionsByUserId(this.isAdmin ? this.selectedUser : localStorage.getItem('userId'));
           
           if (questionId) {
             for (const option of this.options) {
@@ -126,14 +161,12 @@ export default {
     },
     async getQuestionsByUserId(userId) {
       const accessToken = this.getAccessToken();
-  try {
-    const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ access_token: accessToken })
-    });
+      try {
+        const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: accessToken })
+        });
 
         if (response.ok) {
           const questions = await response.json();
@@ -154,35 +187,25 @@ export default {
       try {
         const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/answer', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            access_token: accessToken,
-            correct: correct,
-            question_id: questionId,
-            answer: answerText
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: accessToken, correct, question_id: questionId, answer: answerText })
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to add answer');
-        }
+        if (!response.ok) throw new Error('Failed to add answer');
       } catch (error) {
         console.error('Error adding answer:', error);
       }
     },
     getAccessToken() {
-    const cookieValue = document.cookie;
-    return cookieValue.split('=')[1];
-  },
+      const cookieValue = document.cookie;
+      return cookieValue.split('=')[1];
+    },
     resetForm() {
       this.subject = '';
       this.question = '';
       this.selectedType = 'Multiple Choice';
-      this.options = [
-        { text: '', correct: false }
-      ];
+      this.options = [{ text: '', correct: false }];
+      if (this.isAdmin) this.selectedUser = null;
     },
     showSnackbar(text, color) {
       this.snackbar.text = text;

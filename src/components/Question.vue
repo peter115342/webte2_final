@@ -1,13 +1,16 @@
 <template>
   <v-container fluid>
+    <!-- Question Section -->
     <v-row justify="center">
       <v-col cols="12" md="8">
+        <!-- QR Code Section -->
+
         <v-card v-for="question in questions" :key="question.question_id">
           <v-card-title class="headline">
             {{ question.subject }}
           </v-card-title>
+          
           <v-card-title class="headline">
-
             {{ question.question }}
           </v-card-title>
           <v-card-text>
@@ -39,7 +42,10 @@
             <v-btn color="primary" @click="submitAnswers(question.question_id)">{{ $t('submit') }}</v-btn>
           </v-card-text>
         </v-card>
+        <img :src="qrCodeUrl" alt="QR Code" class="mb-4" style="margin-top: 55px; border-radius: 10px; border: 5px solid rgb(249, 222, 130); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);" />
+
       </v-col>
+      
     </v-row>
   </v-container>
 </template>
@@ -51,11 +57,13 @@ export default {
   data() {
     return {
       questions: [],
-      checkedAnswers: {}
+      checkedAnswers: {},
+      qrCodeUrl: ''
     };
   },
   mounted() {
     this.fetchQuestions();
+    this.generateQRCode();
   },
   methods: {
     async fetchQuestions() {
@@ -128,6 +136,19 @@ export default {
         this.$router.push({ name: 'Results', params: { questionId: questionId.toString() } });
       } catch (error) {
         console.error('Error submitting answers for questionId:', questionId, error);
+      }
+    },
+    async generateQRCode() {
+      const currentPageUrl = window.location.href;
+      const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentPageUrl)}`;
+
+      try {
+        const response = await axios.get(qrCodeApiUrl, { responseType: 'blob' });
+        const qrCodeBlob = new Blob([response.data], { type: 'image/png' });
+        const qrCodeUrl = URL.createObjectURL(qrCodeBlob);
+        this.qrCodeUrl = qrCodeUrl;
+      } catch (error) {
+        console.error('Error generating QR code:', error);
       }
     }
   }
