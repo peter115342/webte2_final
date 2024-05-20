@@ -4,7 +4,7 @@
       <v-toolbar-title class="title clickable" @click="$router.push({ name: 'Homepage' })">{{ $t('appTitle') }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <template v-if="!hasAccessToken">
-        <v-btn @click="showLoginForm = true" class="login-button elevation-2">{{ $t('login') }}</v-btn>
+        <v-btn @click="showLoginForm = true" class="login-button elevation-2" style="margin-right: 10px">{{ $t('login')}} </v-btn>
         <v-dialog v-model="showLoginForm" max-width="500">
           <template v-slot:activator="{ on }"></template>
           <v-card>
