@@ -7,6 +7,7 @@ import EditCopyDelete from '@/components/EditCopyDelete.vue'
 import Homepage from '@/components/HomePage.vue'
 import Question from '@/components/Question.vue'
 import Manual from '../components/Manual.vue';
+import Results from '../components/Results.vue';
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes: [
@@ -15,12 +16,14 @@ const router = createRouter({
       path: '/',
       name: 'Homepage',
       component: Homepage
+      
     },
     
     {
       path: '/question/:code',
       name: 'Question',
-      component: Question
+      component: Question,
+      props: true
     },
   
     {
@@ -36,8 +39,14 @@ const router = createRouter({
     {
       path: '/manual',
       name: 'Manual',
-      component: Manual,
-    }
+      component: Manual
+    },
+    {
+      path: '/result/:questionId',
+      name: 'Results',
+      component: Results,
+      props: true
+    },
   ]
 })
 
