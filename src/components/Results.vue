@@ -6,7 +6,7 @@
           <v-card-title class="headline">{{ $t('answer') }}</v-card-title>
           <v-card-text>
             <div class="button-container">
-              <v-btn @click="showWordCloud = true" v-text="$t('show_word_cloud')" style="margin-right: 15px;"> </v-btn>
+              <v-btn @click="showWordCloud = true" v-text="$t('show_word_cloud')" style="margin-right: 15px; margin-bottom: 10px;"> </v-btn>
               <v-btn @click="showWordCloud = false" v-text="$t('show_answers')"></v-btn>
             </div>
             
