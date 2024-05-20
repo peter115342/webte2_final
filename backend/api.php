@@ -42,10 +42,15 @@ switch ($method) {
             }
         }
 
-        //GENERATE PDF
-        elseif (preg_match("/^\/pdf(?:\/.*)?$/", $endpoint)) {
+        //GENERATE PDF SK
+        elseif (preg_match("/^\/pdf\/SK(?:\/.*)?$/", $endpoint)) {
             header('Content-Type: application/pdf');
-            generatePDF();
+            generatePDF_SK();
+        }
+        //GENERATE PDF EN
+        elseif (preg_match("/^\/pdf\/EN(?:\/.*)?$/", $endpoint)) {
+            header('Content-Type: application/pdf');
+            generatePDF_EN();
         }
 
         //EXPORT ALL USER QUESTIONS AND ANSWERS TO JSON FILE

@@ -23,7 +23,9 @@
     "newUsername": "New username",
     "confirmPassword": "Confirm password",
     "enterCode": "Enter code",
-    "Hesla sa nezhoduju": "Passwords do not match"
+    "Hesla sa nezhoduju": "Passwords do not match",
+    "downloadPDF": "Download PDF"
+
 
   }
   

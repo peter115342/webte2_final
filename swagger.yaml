@@ -3,12 +3,21 @@ info:
   title: Hlasovací systém
   version: 1.0.11
 paths:
- /pdf:
+  /pdf/SK:
     get:
       tags:
         - pdf
-      summary: Creates a pdf from manual page
-      description: Creates a pdf from manual page
+      summary: Creates a pdf from manual page in Slovak
+      description: Creates a pdf from manual page in Slovak
+      responses:
+        '200':
+          description: OK
+  /pdf/EN:
+    get:
+      tags:
+        - pdf
+      summary: Creates a pdf from manual page in English
+      description: Creates a pdf from manual page in English
       responses:
         '200':
           description: OK

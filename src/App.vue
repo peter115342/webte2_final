@@ -32,34 +32,36 @@
       <v-btn icon @click="toggleLanguage">
         <v-img :src="currentFlag" alt="Language Flag" width="24" height="24" />
       </v-btn>
+      <v-btn icon @click="$router.push({ name: 'Manual' })"> <!-- Add this button for Manual -->
+        <v-icon>mdi-book-open</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <!-- Navigation drawer visible only for authenticated users -->
     <template v-if="hasAccessToken">
       <v-navigation-drawer location="right" permanent>
-  <v-divider></v-divider>
-  <v-list dense nav>
-    <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" @click="$router.push({ name: 'AddQuestion' })" ></v-list-item>
-    <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" @click="$router.push({ name: 'EditCopyDelete' })" ></v-list-item>
-    <v-list-item prepend-icon="mdi-lock" :title="$t('changePassword')" value="changePassword" @click="showChangePasswordForm = true"></v-list-item>
-  </v-list>
-</v-navigation-drawer>
+        <v-divider></v-divider>
+        <v-list dense nav>
+          <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" @click="$router.push({ name: 'AddQuestion' })" ></v-list-item>
+          <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" @click="$router.push({ name: 'EditCopyDelete' })" ></v-list-item>
+          <v-list-item prepend-icon="mdi-lock" :title="$t('changePassword')" value="changePassword" @click="showChangePasswordForm = true"></v-list-item>
+        </v-list>
+      </v-navigation-drawer>
 
-<v-dialog v-model="showChangePasswordForm" max-width="500">
-  <v-card>
-    <v-card-title>{{ $t('changePassword') }}</v-card-title>
-    <v-card-text>
-      <!-- Form to change password -->
-      <v-form @submit.prevent="changePassword">
-        <v-text-field v-model="newPassword" :label="$t('newPassword')" type="password"></v-text-field>
-        <v-text-field v-model="confirmNewPassword" :label="$t('confirmNewPassword')" type="password"></v-text-field>
-        <v-btn type="submit" color="primary">{{ $t('changePassword') }}</v-btn>
-      </v-form>
-    </v-card-text>
-  </v-card>
-  <v-alert v-if="newPassword !== confirmNewPassword" type="error">{{ $t('Hesla sa nezhoduju') }}</v-alert>
-</v-dialog>
-
+      <v-dialog v-model="showChangePasswordForm" max-width="500">
+        <v-card>
+          <v-card-title>{{ $t('changePassword') }}</v-card-title>
+          <v-card-text>
+            <!-- Form to change password -->
+            <v-form @submit.prevent="changePassword">
+              <v-text-field v-model="newPassword" :label="$t('newPassword')" type="password"></v-text-field>
+              <v-text-field v-model="confirmNewPassword" :label="$t('confirmNewPassword')" type="password"></v-text-field>
+              <v-btn type="submit" color="primary">{{ $t('changePassword') }}</v-btn>
+            </v-form>
+          </v-card-text>
+        </v-card>
+        <v-alert v-if="newPassword !== confirmNewPassword" type="error">{{ $t('Hesla sa nezhoduju') }}</v-alert>
+      </v-dialog>
     </template>
 
     <v-main>
@@ -206,7 +208,6 @@ const hasAccessToken = computed(() => {
 
 
 </script>
-
 
 <style scoped>
 .title {
