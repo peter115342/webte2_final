@@ -1,51 +1,46 @@
 <template>
   <div>
-    <h2>Questions</h2>
-    <table>
-      <thead>
+    <h2 class="mb-4">Questions</h2>
+    <div class="subject-filter">
+  <label for="subjectFilter">Filter by Subject:</label>
+  <select id="subjectFilter" v-model="selectedSubject" class="subject-dropdown">
+    <option value="">All Subjects</option>
+    <option v-for="subject in uniqueSubjects" :value="subject">{{ subject }}</option>
+  </select>
+</div>
+
+
+    <v-data-table
+      :headers="headers"
+      :items="uniqueQuestions"
+      item-key="question_id"
+      class="elevation-1"
+    >
+      <template v-slot:item="{ item }">
         <tr>
-          <th>Question ID</th>
-          <th>Question</th>
-          <th>Subject</th>
-          <th>Delete</th>
-          <th>Copy</th>
-          <th>Edit</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="question in uniqueQuestions" :key="question.question_id">
-          <td>{{ question.question_id }}</td>
-          <td>{{ question.question }}</td>
-          <td>{{ question.subject }}</td>
+          <td>{{ item.question_id }}</td>
+          <td>{{ item.question }}</td>
+          <td>{{ item.subject }}</td>
           <td>
-            <button @click="deleteQuestion(question)"><i class="mdi mdi-delete"></i></button>
+            <v-icon small class="red--text" @click="deleteQuestion(item)">mdi-delete</v-icon>
           </td>
           <td>
-            <button @click="copyQuestion(question)"><i class="mdi mdi-content-copy"></i></button>
+            <v-icon small @click="copyQuestion(item)">mdi-content-copy</v-icon>
           </td>
           <td>
-            <button @click="showEditForm(question)"><i class="mdi mdi-pencil"></i></button>
+            <v-icon small @click="showEditForm(item)">mdi-pencil</v-icon>
           </td>
         </tr>
-      </tbody>
-    </table>
+      </template>
+    </v-data-table>
+
     <v-dialog v-model="showEdit" max-width="500px">
       <v-card>
-        <v-card-title>Edit Question</v-card-title>
+        <v-card-title class="headline">Edit Question</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="submitEditedQuestion">
-            <v-text-field
-              v-model="editedQuestion.question"
-              label="Question"
-              outlined
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="editedQuestion.subject"
-              label="Subject"
-              outlined
-              required
-            ></v-text-field>
+            <v-text-field v-model="editedQuestion.question" label="Question" outlined required></v-text-field>
+            <v-text-field v-model="editedQuestion.subject" label="Subject" outlined required></v-text-field>
             <v-btn type="submit" color="primary">Save</v-btn>
             <v-btn @click="cancelEdit">Cancel</v-btn>
           </v-form>
@@ -61,30 +56,54 @@ export default {
     return {
       questions: [],
       copySuccess: false,
+      selectedSubject: '',
       showEdit: false,
       editedQuestion: {
         question_id: null,
         question: '',
         subject: '',
         type_id: null
-      }
+      },
+      headers: [
+        { text: 'Question ID', value: 'question_id' },
+        { text: 'Question', value: 'question' },
+        { text: 'Subject', value: 'subject' },
+        { text: 'Delete', value: 'actions', sortable: false },
+        { text: 'Copy', value: 'actions', sortable: false },
+        { text: 'Edit', value: 'actions', sortable: false }
+      ],
+      allUserIds: [], // New array to store all user IDs
+      allUserQuestions: [], // New array to store questions of all users
     };
   },
   computed: {
     uniqueQuestions() {
-      // Deduplicate questions based on 'question_id'
-      const uniqueQuestions = [];
-      const questionIds = new Set();
-      this.questions.forEach(question => {
-        if (!questionIds.has(question.question_id)) {
-          uniqueQuestions.push(question);
-          questionIds.add(question.question_id);
-        }
-      });
-      return uniqueQuestions;
-    }
+    const filteredQuestions = this.questions.filter(question => {
+      return this.selectedSubject === '' || question.subject === this.selectedSubject;
+    });
+
+    // Deduplicate questions based on 'question_id'
+    const uniqueQuestions = [];
+    const questionIds = new Set();
+    filteredQuestions.forEach(question => {
+      if (!questionIds.has(question.question_id)) {
+        uniqueQuestions.push(question);
+        questionIds.add(question.question_id);
+      }
+    });
+    return uniqueQuestions;
+  },
+    uniqueSubjects() {
+    const subjects = new Set();
+    this.questions.forEach(question => subjects.add(question.subject));
+    return Array.from(subjects);
+  }
   },
   mounted() {
+    console.log("administrator", localStorage.getItem('admin'));
+    if (localStorage.getItem('admin') === '1') {
+      this.getAllUserIds();
+    }
     this.fetchQuestionsByUserId(localStorage.getItem('userId'));
   },
   methods: {
@@ -345,7 +364,60 @@ export default {
       } catch (error) {
         console.error('Error updating question:', error);
       }
+    },
+    async getAllUserIds() {
+      try {
+        const accessToken = this.getAccessToken();
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ access_token: accessToken })
+        };
+
+        const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/user/list', requestOptions);
+        if (response.ok) {
+          const data = await response.json();
+          const allUserIds = data.map(user => user.id);
+          console.log('All User IDs:', allUserIds);
+          this.getAllUserQuestions(allUserIds); // After getting user IDs, get their questions
+        } else {
+          console.error('Failed to fetch user IDs:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching user IDs:', error);
+      }
+    },
+ async getAllUserQuestions(allUserIds) {
+  try {
+    const accessToken = this.getAccessToken();
+    for (const userId of allUserIds) {
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ access_token: accessToken })
+      };
+
+      const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, requestOptions);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          // Add questions for each user to the 'questions' array
+          this.questions.push(...data);
+        }
+      } else {
+        console.error(`Failed to fetch questions for user ${userId}:`, response.statusText);
+      }
     }
+    console.log('All User Questions:', this.questions);
+  } catch (error) {
+    console.error('Error fetching user questions:', error);
+  }
+}
+
   }
 };
 </script>
@@ -388,4 +460,26 @@ button i {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 999;
 }
+.red--text {
+    color: red;
+  }
+  .subject-filter {
+  margin-bottom: 20px;
+}
+
+.subject-dropdown {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  width: 200px;
+}
+
+.subject-dropdown:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
 </style>

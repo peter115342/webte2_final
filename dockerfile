@@ -13,5 +13,7 @@ RUN npm run build
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./ssl/certs/webte_fei_stuba_sk.pem /etc/ssl/certs/webte_fei_stuba_sk.pem
+COPY ./ssl/private/webte.fei.stuba.sk.key /etc/ssl/private/webte.fei.stuba.sk.key
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
