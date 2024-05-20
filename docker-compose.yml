@@ -12,10 +12,12 @@ services:
       - mysql
 
   nginx:
-    image: nginx:alpine
+    image: nginx:stable-alpine
     container_name: nginx-app
     ports:
       - 82:82
+      - "80:80"
+      - "443:443"
     depends_on:
       - app
       - php
