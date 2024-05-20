@@ -1,6 +1,15 @@
 <template>
   <div>
     <h2 class="mb-4">Questions</h2>
+    <div class="subject-filter">
+  <label for="subjectFilter">Filter by Subject:</label>
+  <select id="subjectFilter" v-model="selectedSubject" class="subject-dropdown">
+    <option value="">All Subjects</option>
+    <option v-for="subject in uniqueSubjects" :value="subject">{{ subject }}</option>
+  </select>
+</div>
+
+
     <v-data-table
       :headers="headers"
       :items="uniqueQuestions"
@@ -47,6 +56,7 @@ export default {
     return {
       questions: [],
       copySuccess: false,
+      selectedSubject: '',
       showEdit: false,
       editedQuestion: {
         question_id: null,
@@ -68,17 +78,26 @@ export default {
   },
   computed: {
     uniqueQuestions() {
-      // Deduplicate questions based on 'question_id'
-      const uniqueQuestions = [];
-      const questionIds = new Set();
-      this.questions.forEach(question => {
-        if (!questionIds.has(question.question_id)) {
-          uniqueQuestions.push(question);
-          questionIds.add(question.question_id);
-        }
-      });
-      return uniqueQuestions;
-    }
+    const filteredQuestions = this.questions.filter(question => {
+      return this.selectedSubject === '' || question.subject === this.selectedSubject;
+    });
+
+    // Deduplicate questions based on 'question_id'
+    const uniqueQuestions = [];
+    const questionIds = new Set();
+    filteredQuestions.forEach(question => {
+      if (!questionIds.has(question.question_id)) {
+        uniqueQuestions.push(question);
+        questionIds.add(question.question_id);
+      }
+    });
+    return uniqueQuestions;
+  },
+    uniqueSubjects() {
+    const subjects = new Set();
+    this.questions.forEach(question => subjects.add(question.subject));
+    return Array.from(subjects);
+  }
   },
   mounted() {
     console.log("administrator", localStorage.getItem('admin'));
@@ -444,4 +463,23 @@ button i {
 .red--text {
     color: red;
   }
+  .subject-filter {
+  margin-bottom: 20px;
+}
+
+.subject-dropdown {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  width: 200px;
+}
+
+.subject-dropdown:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
 </style>
