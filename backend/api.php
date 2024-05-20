@@ -78,6 +78,31 @@ switch ($method) {
                 http_response_code(400);
             }
         }
+
+        //EXPORT ALL QUESTIONS AND ANSWERS TO JSON FILE
+        elseif (preg_match("/^\/question\/export$/", $endpoint, $matches)) {
+
+            $questions = $questionObject->getQuestionsFromAllUsersForExport();
+            if($questions){
+                $questionsAndAnswers = [];
+                foreach ($questions as $question) {
+                    $question_id = $question['id'];
+                    $answers = $questionObject->getAllQuestionAnswers($question_id);
+                    $question['answers'] = $answers;
+                    $questionsAndAnswers[] = $question;
+                }
+
+                $data = array("questions" => $questionsAndAnswers);
+                $json_data = json_encode($data);
+                header('Content-Disposition: attachment; filename="export.json"');
+
+                echo $json_data;
+                exit();
+            } else {
+                echo json_encode(["message" => "Error"]);
+                http_response_code(400);
+            }
+        }
         else {
             http_response_code(400);
             echo json_encode(["message" => "Bad request"]);

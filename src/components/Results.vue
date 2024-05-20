@@ -5,15 +5,31 @@
         <v-card>
           <v-card-title class="headline">{{ $t('answer') }}</v-card-title>
           <v-card-text>
-            <v-list>
-              <v-list-item v-for="answer in answers" :key="answer.answer_id">
-                <v-list-item-content>
-                  <v-list-item-title>{{ answer.answer }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ $t('count') }}: {{ answer.count }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-            <p class="caption">{{ $t('caption') }}</p>
+            <div class="button-container">
+              <v-btn @click="showWordCloud = true" v-text="$t('show_word_cloud')"></v-btn>
+              <v-btn @click="showWordCloud = false" v-text="$t('show_answers')"></v-btn>
+            </div>
+            
+            <div v-if="showWordCloud">
+              <div class="word-cloud">
+                <span v-for="(answer, index) in answers" :key="index" :style="{ fontSize: getFontSize(answer.count) + 'px' }">
+                  {{ answer.answer }}
+                </span>
+              </div>
+            </div>
+            
+            <div v-else>
+              <v-list>
+                <v-list-item v-for="answer in answers" :key="answer.answer_id">
+                  <v-list-item-content>
+                    <v-list-item-title>{{ answer.answer }}</v-list-item-title>
+                    <v-list-item-subtitle>{{ $t('count') }}: {{ answer.count }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+              <p class="caption">{{ $t('caption') }}</p>
+            </div>
+            
           </v-card-text>
         </v-card>
       </v-col>
@@ -34,7 +50,8 @@ export default {
   data() {
     return {
       question: {},
-      answers: []
+      answers: [],
+      showWordCloud: false
     };
   },
   async mounted() {
@@ -57,12 +74,28 @@ export default {
       } catch (error) {
         console.error('Error fetching question and answers:', error);
       }
+    },
+    getFontSize(count) {
+      // Adjust the scaling factor as needed
+      const scalingFactor = 20;
+      return count * scalingFactor;
     }
   }
 };
 </script>
 
 <style scoped>
+.button-container {
+  margin-bottom: 20px;
+}
+
+.word-cloud {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.word-cloud span {
+  margin-right: 20px;
 /* Add your custom styles here */
 .caption {
   font-size: 12px;

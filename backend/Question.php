@@ -99,6 +99,22 @@ class Question
         }
     }
 
+    public function getQuestionsFromAllUsersForExport()
+    {
+        $query = "SELECT id, user_id, date, subject, question, type_id, code
+          FROM questions";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $questions[] = $row;
+        }
+        $stmt->close();
+        return $questions;
+    }
+
     public function getAllQuestionsForExport($user_id)
     {
         $query = "SELECT id, date, subject, question, type_id, code FROM questions WHERE user_id = ?";
