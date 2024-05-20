@@ -67,7 +67,9 @@ export default {
         question: '',
         subject: '',
         type_id: null
-      }
+      },
+      allUserIds: [], // New array to store all user IDs
+      allUserQuestions: [], // New array to store questions of all users
     };
   },
   computed: {
@@ -85,6 +87,10 @@ export default {
     }
   },
   mounted() {
+    console.log("administrator", localStorage.getItem('admin'));
+    if (localStorage.getItem('admin') === '1') {
+      this.getAllUserIds();
+    }
     this.fetchQuestionsByUserId(localStorage.getItem('userId'));
   },
   methods: {
@@ -345,7 +351,60 @@ export default {
       } catch (error) {
         console.error('Error updating question:', error);
       }
+    },
+    async getAllUserIds() {
+      try {
+        const accessToken = this.getAccessToken();
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ access_token: accessToken })
+        };
+
+        const response = await fetch('https://node79.webte.fei.stuba.sk/final/api/user/list', requestOptions);
+        if (response.ok) {
+          const data = await response.json();
+          const allUserIds = data.map(user => user.id);
+          console.log('All User IDs:', allUserIds);
+          this.getAllUserQuestions(allUserIds); // After getting user IDs, get their questions
+        } else {
+          console.error('Failed to fetch user IDs:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching user IDs:', error);
+      }
+    },
+ async getAllUserQuestions(allUserIds) {
+  try {
+    const accessToken = this.getAccessToken();
+    for (const userId of allUserIds) {
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ access_token: accessToken })
+      };
+
+      const response = await fetch(`https://node79.webte.fei.stuba.sk/final/api/question/user/${userId}`, requestOptions);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          // Add questions for each user to the 'questions' array
+          this.questions.push(...data);
+        }
+      } else {
+        console.error(`Failed to fetch questions for user ${userId}:`, response.statusText);
+      }
     }
+    console.log('All User Questions:', this.questions);
+  } catch (error) {
+    console.error('Error fetching user questions:', error);
+  }
+}
+
   }
 };
 </script>
