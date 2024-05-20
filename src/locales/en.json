@@ -24,7 +24,9 @@
     "confirmPassword": "Confirm password",
     "enterCode": "Enter code",
     "Hesla sa nezhoduju": "Passwords do not match",
-    "downloadPDF": "Download PDF"
+    "downloadPDF": "Download PDF",
+    "answer": "Results", 
+    "count": "Count"
 
 
   }

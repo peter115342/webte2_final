@@ -4,13 +4,12 @@
       <v-toolbar-title class="title clickable" @click="$router.push({ name: 'Homepage' })">{{ $t('appTitle') }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <template v-if="!hasAccessToken">
-        <v-btn @click="showLoginForm = true" class="login-button elevation-2">{{ $t('login') }}</v-btn>
+        <v-btn @click="showLoginForm = true" class="login-button elevation-2" style="margin-right: 10px">{{ $t('login')}} </v-btn>
         <v-dialog v-model="showLoginForm" max-width="500">
           <template v-slot:activator="{ on }"></template>
           <v-card>
             <v-card-text>
-              <!-- Login component emits accessToken -->
-              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId"  @admin="saveAdmin"/>
+              <Login @loginSuccess="handleLoginSuccess" @registerSuccess="handleRegisterSuccess" @loginError="handleLoginError" @accessToken="handleAccessToken" @username="saveUsername" @id="saveUserId" @admin="saveAdmin" />
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -32,27 +31,28 @@
       <v-btn icon @click="toggleLanguage">
         <v-img :src="currentFlag" alt="Language Flag" width="24" height="24" />
       </v-btn>
-      <v-btn icon @click="$router.push({ name: 'Manual' })"> <!-- Add this button for Manual -->
+      <v-btn icon @click="$router.push({ name: 'Manual' })">
         <v-icon>mdi-book-open</v-icon>
+      </v-btn>
+      <!-- Drawer icon button -->
+      <v-btn v-if="hasAccessToken" icon @click="drawer = !drawer">
+        <v-icon>mdi-menu</v-icon>
       </v-btn>
     </v-app-bar>
 
-    <!-- Navigation drawer visible only for authenticated users -->
     <template v-if="hasAccessToken">
-      <v-navigation-drawer location="right" permanent>
-        <v-divider></v-divider>
+      <v-navigation-drawer v-model="drawer" app>
         <v-list dense nav>
-          <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" @click="$router.push({ name: 'AddQuestion' })" ></v-list-item>
-          <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" @click="$router.push({ name: 'EditCopyDelete' })" ></v-list-item>
+          <v-list-item prepend-icon="mdi-plus" :title="$t('addQuestion')" @click="$router.push({ name: 'AddQuestion' })"></v-list-item>
+          <v-list-item prepend-icon="mdi-pencil" :title="$t('editQuestion')" @click="$router.push({ name: 'EditCopyDelete' })"></v-list-item>
           <v-list-item prepend-icon="mdi-lock" :title="$t('changePassword')" value="changePassword" @click="showChangePasswordForm = true"></v-list-item>
         </v-list>
       </v-navigation-drawer>
-
+      
       <v-dialog v-model="showChangePasswordForm" max-width="500">
         <v-card>
           <v-card-title>{{ $t('changePassword') }}</v-card-title>
           <v-card-text>
-            <!-- Form to change password -->
             <v-form @submit.prevent="changePassword">
               <v-text-field v-model="newPassword" :label="$t('newPassword')" type="password"></v-text-field>
               <v-text-field v-model="confirmNewPassword" :label="$t('confirmNewPassword')" type="password"></v-text-field>
@@ -74,39 +74,33 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Login from './components/Login.vue';
+import axios from 'axios';
 
 const { locale } = useI18n();
 
-// Define reactive variables
 const showLoginForm = ref(false);
 const showUserModal = ref(false);
-const cookieValue = ref(document.cookie);
+const drawer = ref(false);
 const showChangePasswordForm = ref(false);
-const oldPassword = ref('');
-import axios from 'axios';
+const cookieValue = ref(document.cookie);
 const newPassword = ref('');
 const confirmNewPassword = ref('');
 
-// Function to handle password change
 const changePassword = async () => {
   try {
     const userId = localStorage.getItem('userId');
     const accessToken = cookieValue.value.split('=')[1];
     const url = `https://node79.webte.fei.stuba.sk/final/api/user/${userId}`;
-    // Check if new password and confirm password match
     if (newPassword.value !== confirmNewPassword.value) {
-      console.error('New password and confirm password do not match');
-      // Display an error message to the user
       alert('New password and confirm password do not match');
-      return; // Exit the function if passwords do not match
+      return;
     }
     const response = await axios.put(url, {
-      username: localStorage.getItem("username"),
+      username: localStorage.getItem('username'),
       access_token: accessToken,
       password: newPassword.value,
-      administrator: localStorage.getItem("administrator")
+      administrator: localStorage.getItem('administrator')
     });
-    console.log('API response:', response); // Log the API response
     if (response.status === 200) {
       console.log('Password changed successfully');
     } else {
@@ -116,30 +110,31 @@ const changePassword = async () => {
     console.error('An error occurred while changing password:', error);
   }
 };
+
 const saveUserId = (id) => {
   localStorage.setItem('userId', id);
-}
-// Handle successful login
+};
+
 const handleLoginSuccess = () => {
-  showLoginForm.value = false; 
+  showLoginForm.value = false;
   handleAccessToken(cookieValue.value.split('=')[1]);
   window.location.reload();
 };
+
 const saveUsername = (username) => {
   localStorage.setItem('username', username);
 };
-const saveAdmin= (admin) => {
+
+const saveAdmin = (admin) => {
   localStorage.setItem('admin', admin);
-}
+};
+
 const getUsernameFromLocalStorage = () => {
   return localStorage.getItem('username');
 };
-// Handle login error
-const handleLoginError = () => {
-  // Implement error handling logic here
-};
 
-// Handle successful user registration
+const handleLoginError = () => {};
+
 const handleRegisterSuccess = () => {
   setTimeout(() => {
     showLoginForm.value = false;
@@ -152,38 +147,31 @@ const handleAccessToken = (accessToken) => {
   }
 };
 
-// Function to toggle between languages
 const toggleLanguage = async () => {
   locale.value = locale.value === 'en' ? 'sk' : 'en';
 };
 
-// Import translations for language flags
 import skFlag from './assets/slovakia.png';
 import enFlag from './assets/united-kingdom.png';
 
-// Define current language flag
 const currentFlag = ref('');
 watch(locale, () => {
   currentFlag.value = locale.value === 'en' ? enFlag : skFlag;
 });
-toggleLanguage(); // Toggle language on startup
+toggleLanguage();
 
-// Close the user modal when clicked outside
 const closeUserModal = () => {
   showUserModal.value = false;
 };
 
-// Watch for changes in document.cookie
 watch(() => document.cookie, (newValue) => {
   cookieValue.value = newValue;
 });
 
-// Check if the access token is valid
 const isValidAccessToken = (access_token) => {
   return access_token && /^[a-zA-Z0-9]{32}$/.test(access_token);
 };
 
-// Logout function
 const logout = () => {
   document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   localStorage.removeItem('username');
@@ -192,7 +180,6 @@ const logout = () => {
   window.location.reload();
 };
 
-// Close user modal when mounted
 onMounted(() => {
   document.body.addEventListener('click', (event) => {
     const modal = document.querySelector('.v-dialog__content--active');
@@ -205,8 +192,6 @@ onMounted(() => {
 const hasAccessToken = computed(() => {
   return isValidAccessToken(cookieValue.value.split('=')[1]);
 });
-
-
 </script>
 
 <style scoped>
@@ -220,7 +205,6 @@ const hasAccessToken = computed(() => {
 .login-button {
   background-color: #ffd166;
 }
-
 .user-modal .v-dialog {
   position: absolute !important;
   top: 0 !important;
@@ -230,5 +214,4 @@ const hasAccessToken = computed(() => {
 .clickable {
   cursor: pointer;
 }
-
 </style>

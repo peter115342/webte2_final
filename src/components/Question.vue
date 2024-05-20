@@ -5,6 +5,9 @@
         <v-card v-for="question in questions" :key="question.question_id">
           <v-card-title class="headline">
             {{ question.subject }}
+          </v-card-title>
+          <v-card-title class="headline">
+
             {{ question.question }}
           </v-card-title>
           <v-card-text>
@@ -121,6 +124,8 @@ export default {
           });
         }
         console.log('Submitted answers for questionId:', questionId, this.checkedAnswers[questionId]);
+        // Navigate to results page after submitting answers
+        this.$router.push({ name: 'Results', params: { questionId: questionId.toString() } });
       } catch (error) {
         console.error('Error submitting answers for questionId:', questionId, error);
       }
